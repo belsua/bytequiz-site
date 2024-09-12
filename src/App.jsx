@@ -1,34 +1,44 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+// src/App.jsx
+import React, { useState } from 'react'
+import { GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth'
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
+import { auth } from './firebase/firebase'
+import Navbar from './components/UI/Navbar'
+import MainContent from './components/UI/MainContent'
+import Footer from './components/UI/Footer'
+import Dashboard from './pages/Dashboard'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [user, setUser] = useState(null)
+
+  const googleSignIn = async navigate => {
+    const provider = new GoogleAuthProvider()
+    try {
+      const result = await signInWithPopup(auth, provider)
+      setUser(result.user)
+      navigate('/dashboard') // Redirect to dashboard after successful login
+    } catch (error) {
+      console.error('Error during sign-in:', error)
+    }
+  }
+
+  const handleSignOut = async navigate => {
+    await signOut(auth)
+    setUser(null)
+    navigate('/') // Redirect to homepage after signout
+  }
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <Router>
+      <div className="min-h-screen flex flex-col">
+        <Navbar user={user} googleSignIn={googleSignIn} handleSignOut={handleSignOut} />
+        <Routes>
+          <Route path="/" element={<MainContent />} />
+          <Route path="/dashboard" element={<Dashboard user={user} />} /> {/* Pass user to Dashboard */}
+        </Routes>
+        <Footer />
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    </Router>
   )
 }
 
