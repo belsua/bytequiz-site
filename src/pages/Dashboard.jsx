@@ -4,86 +4,97 @@ import { useNavigate } from 'react-router-dom'
 import { ref, get } from 'firebase/database' // Import Firebase database functions
 import { database } from '../firebase/firebase' // Import the database instance
 
-const Dashboard = ({ user }) => {
+const Dashboard = () => {
   const navigate = useNavigate()
-  const [userData, setUserData] = useState(null)
+  const [usersData, setUsersData] = useState(null)
 
-  // Redirect if the user is not logged in
+  // Fetch all users' data from Firebase
   useEffect(() => {
-    if (!user) {
-      navigate('/')
-    }
-  }, [user, navigate])
+    const fetchData = async () => {
+      const usersRef = ref(database, 'users') // Reference to the 'users' node in the database
 
-  // Fetch data from Firebase
-  useEffect(() => {
-    if (user) {
-      const userId = user.uid // Get the logged-in user's UID
-      const userRef = ref(database, `users/${userId}`) // Reference to the user's data in the database
-
-      const fetchData = async () => {
-        try {
-          const snapshot = await get(userRef)
-          if (snapshot.exists()) {
-            setUserData(snapshot.val()) // Store the user's data in state
-          } else {
-            console.log('No data available')
-          }
-        } catch (error) {
-          console.error('Error fetching data:', error)
+      try {
+        const snapshot = await get(usersRef)
+        if (snapshot.exists()) {
+          setUsersData(snapshot.val()) // Store all users' data in state
+        } else {
+          console.log('No data available')
         }
+      } catch (error) {
+        console.error('Error fetching data:', error)
       }
-
-      fetchData()
     }
-  }, [user])
 
-  if (!userData) {
-    return <div>Loading...</div>
+    fetchData()
+  }, [navigate])
+
+  if (!usersData) {
+    return <div>Loading...</div> // Show loading while data is being fetched
+  }
+
+  // Recursive function to render nested objects
+  const renderNestedObject = obj => {
+    return Object.entries(obj).map(([key, value]) => {
+      if (typeof value === 'object' && value !== null) {
+        // If the value is an object, recursively render it
+        return (
+          <div key={key} style={{ marginLeft: '20px' }}>
+            <strong>{key}:</strong>
+            <div>{renderNestedObject(value)}</div>
+          </div>
+        )
+      } else {
+        // If the value is a primitive type, render it directly
+        return (
+          <div key={key} style={{ marginLeft: '20px' }}>
+            <strong>{key}:</strong> {value !== null ? value.toString() : 'null'}
+          </div>
+        )
+      }
+    })
   }
 
   return (
     <div className="container mx-auto">
-      <h1 className="text-3xl font-bold text-center mb-8">Welcome to Your Dashboard</h1>
+      <h1 className="text-3xl font-bold text-center mb-8">Users Dashboard</h1>
 
-      {/* Render the user's profile data */}
-      <div className="mb-4">
-        <h2 className="text-2xl">Profile</h2>
-        <p>
-          <strong>Name:</strong> {userData.profile.name}
-        </p>
-        <p>
-          <strong>Player ID:</strong> {userData.profile.playerId}
-        </p>
-      </div>
-
-      {/* Render the user's stats data */}
-      <div className="mb-4">
-        <h2 className="text-2xl">Stats</h2>
-        <ul>
-          <li>
-            <strong>Computer Elements:</strong> {userData.stats.computerElements}
-          </li>
-          <li>
-            <strong>Computer History:</strong> {userData.stats.computerHistory}
-          </li>
-          <li>
-            <strong>Intro Programming:</strong> {userData.stats.introProgramming}
-          </li>
-          <li>
-            <strong>Is Intro Programming Unlocked:</strong> {userData.stats.isIntroProgrammingUnlocked ? 'Yes' : 'No'}
-          </li>
-          <li>
-            <strong>Is Number System Unlocked:</strong> {userData.stats.isNumberSystemUnlocked ? 'Yes' : 'No'}
-          </li>
-          <li>
-            <strong>Need Welcome:</strong> {userData.stats.needWelcome ? 'Yes' : 'No'}
-          </li>
-          <li>
-            <strong>Number System:</strong> {userData.stats.numberSystem}
-          </li>
-        </ul>
-      </div>
+      {/* Iterate over all users and display their data */}
+      {Object.entries(usersData).map(([userId, user]) => (
+        <div key={userId} className="mb-6">
+          <h2 className="text-2xl">Profile</h2>
+          {user.profile ? renderNestedObject(user.profile) : <p>No profile data available</p>} {/* Render profile section */}
+          <h2 className="text-2xl mt-4">Stats</h2>
+          {user.stats ? renderNestedObject(user.stats) : <p>No stats data available</p>} {/* Render stats section */}
+          <h2 className="text-2xl mt-4">Activities</h2>
+          {user.activities ? (
+            Object.entries(user.activities).map(([activityId, activity]) => (
+              <div key={activityId} style={{ marginLeft: '20px' }}>
+                <p>
+                  <strong>Date-Time:</strong> {activity['date-time']}
+                </p>
+                <p>
+                  <strong>Minigame:</strong> {activity.minigame}
+                </p>
+                <p>
+                  <strong>Mode:</strong> {activity.mode}
+                </p>
+                <p>
+                  <strong>Topic:</strong> {activity.topic}
+                </p>
+                <p>
+                  <strong>Score:</strong> {activity.score}
+                </p>
+                <p>
+                  <strong>Players:</strong> {activity.players ? activity.players.join(', ') : 'No players available'}
+                </p>
+              </div>
+            ))
+          ) : (
+            <p>No activities data available</p>
+          )}
+          <hr className="my-4" />
+        </div>
+      ))}
     </div>
   )
 }
