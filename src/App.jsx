@@ -1,39 +1,45 @@
 // src/App.jsx
 import React, { useState } from 'react'
-import { GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth'
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'
-import { auth } from './firebase/firebase'
+import { signInWithEmailAndPassword, signOut } from 'firebase/auth' // Firebase functions
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom' // Import Router, Route, and Routes
+import { auth } from './firebase/firebase' // Firebase config
 import Navbar from './components/UI/Navbar'
 import MainContent from './components/UI/MainContent'
 import Footer from './components/UI/Footer'
 import Dashboard from './pages/Dashboard'
+import Login from './components/Auth/Login' // Login component
 
 function App() {
   const [user, setUser] = useState(null)
 
-  const googleSignIn = async navigate => {
-    const provider = new GoogleAuthProvider()
+  // Function for email/password sign-in
+  const emailPasswordSignIn = async (email, password) => {
     try {
-      const result = await signInWithPopup(auth, provider)
+      const result = await signInWithEmailAndPassword(auth, email, password)
       setUser(result.user)
-      navigate('/dashboard') // Redirect to dashboard after successful login
     } catch (error) {
       console.error('Error during sign-in:', error)
+      throw error
     }
   }
 
-  const handleSignOut = async navigate => {
-    await signOut(auth)
-    setUser(null)
-    navigate('/') // Redirect to homepage after signout
+  // Function to handle sign-out
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth)
+      setUser(null) // Reset user state after sign-out
+    } catch (error) {
+      console.error('Error during sign-out:', error)
+    }
   }
 
   return (
     <Router>
       <div className="min-h-screen flex flex-col">
-        <Navbar user={user} googleSignIn={googleSignIn} handleSignOut={handleSignOut} />
+        <Navbar user={user} handleSignOut={handleSignOut} />
         <Routes>
           <Route path="/" element={<MainContent />} />
+          <Route path="/login" element={<Login emailPasswordSignIn={emailPasswordSignIn} />} /> {/* Pass the login function */}
           <Route path="/dashboard" element={<Dashboard user={user} />} /> {/* Pass user to Dashboard */}
         </Routes>
         <Footer />

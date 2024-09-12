@@ -1,6 +1,6 @@
 // /hooks/useDatabase.js
 import { ref, get, set } from 'firebase/database'
-import { database } from '../services/firebaseConfig'
+import { database } from './firebase/firebase'
 
 export const useDatabase = () => {
   const fetchData = async () => {

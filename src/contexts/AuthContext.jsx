@@ -1,6 +1,6 @@
 // /context/AuthContext.js
 import React, { createContext, useEffect, useState } from 'react'
-import { auth } from '../services/firebaseConfig'
+import { auth } from '../firebase/firebase'
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from 'firebase/auth'
 
 export const AuthContext = createContext()

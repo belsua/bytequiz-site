@@ -1,19 +1,17 @@
+// src/components/UI/Navbar.jsx
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 
-const Navbar = ({ user, googleSignIn, handleSignOut }) => {
-  const navigate = useNavigate()
+const Navbar = ({ user, handleSignOut }) => {
+  const navigate = useNavigate() // useNavigate inside the Navbar component
 
-  const handleLogin = () => {
-    googleSignIn(navigate)
-  }
-
-  const handleLogout = () => {
-    handleSignOut(navigate)
+  const handleLogout = async () => {
+    await handleSignOut() // Call the sign-out function from App
+    navigate('/') // Redirect to home after sign-out
   }
 
   return (
-    <nav className="bg-gray-800 p-4 text-white fixed top-0 left-0 right-0 z-10">
+    <nav className="bg-gray-800 p-4 text-white sticky top-0 left-0 right-0 z-10">
       <div className="container mx-auto flex justify-between items-center">
         <a href="/" className="text-xl font-bold">
           My App
@@ -21,15 +19,15 @@ const Navbar = ({ user, googleSignIn, handleSignOut }) => {
         <div>
           {user ? (
             <div className="flex items-center">
-              <p className="mr-4">Welcome, {user.displayName}</p>
+              <p className="mr-4">Welcome, {user.email}</p>
               <button onClick={handleLogout} className="bg-red-500 px-4 py-2 rounded">
                 Sign Out
               </button>
             </div>
           ) : (
-            <button onClick={handleLogin} className="bg-green-500 px-4 py-2 rounded">
-              Sign In with Google
-            </button>
+            <a href="/login" className="bg-green-500 px-4 py-2 rounded">
+              Sign In
+            </a>
           )}
         </div>
       </div>
