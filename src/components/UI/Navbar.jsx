@@ -19,7 +19,7 @@ const Navbar = ({ user, handleSignOut }) => {
         <div>
           {user ? (
             <div className="flex items-center">
-              <p className="mr-4">Welcome, {user.email}</p>
+              <p className="mr-4">Hello, {user.email}</p>
               <button onClick={handleLogout} className="bg-red-500 px-4 py-2 rounded">
                 Sign Out
               </button>
