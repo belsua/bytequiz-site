@@ -14,7 +14,7 @@ const Navbar = ({ user, handleSignOut }) => {
     <nav className="bg-gray-800 p-4 text-white sticky top-0 left-0 right-0 z-10">
       <div className="container mx-auto flex justify-between items-center">
         <a href="/" className="text-xl font-bold">
-          My App
+          ByteQuiz
         </a>
         <div>
           {user ? (
