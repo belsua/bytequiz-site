@@ -33,15 +33,31 @@ function App() {
     }
   }
 
+  // return (
+  //   <Router>
+  //     <div className="flex flex-col min-h-screen">
+  //       <Navbar user={user} handleSignOut={handleSignOut} />
+  //       <Routes>
+  //         <Route path="/" element={<MainContent />} />
+  //         <Route path="/login" element={<Login emailPasswordSignIn={emailPasswordSignIn} />} /> {/* Pass the login function */}
+  //         <Route path="/dashboard" element={<Dashboard user={user} />} /> {/* Pass user to Dashboard */}
+  //       </Routes>
+  //       <Footer />
+  //     </div>
+  //   </Router>
+  // )
+
   return (
     <Router>
-      <div className="min-h-screen flex flex-col">
+      <div className="flex flex-col min-h-screen">
         <Navbar user={user} handleSignOut={handleSignOut} />
-        <Routes>
-          <Route path="/" element={<MainContent />} />
-          <Route path="/login" element={<Login emailPasswordSignIn={emailPasswordSignIn} />} /> {/* Pass the login function */}
-          <Route path="/dashboard" element={<Dashboard user={user} />} /> {/* Pass user to Dashboard */}
-        </Routes>
+        <main className="flex-grow">
+          <Routes>
+            <Route path="/" element={<MainContent />} />
+            <Route path="/login" element={<Login emailPasswordSignIn={emailPasswordSignIn} />} /> {/* Pass the login function */}
+            <Route path="/dashboard" element={<Dashboard user={user} />} /> {/* Pass user to Dashboard */}
+          </Routes>
+        </main>
         <Footer />
       </div>
     </Router>
