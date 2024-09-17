@@ -1,17 +1,19 @@
 // src/components/Auth/Login.jsx
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { AuthContext } from '../../contexts/AuthContext' // Import AuthContext
 
-const Login = ({ emailPasswordSignIn }) => {
+const Login = () => {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState(null)
-  const navigate = useNavigate() // useNavigate hook to navigate programmatically
+  const { login } = useContext(AuthContext) // Access the login function from AuthContext
+  const navigate = useNavigate()
 
   const handleSubmit = async e => {
     e.preventDefault()
     try {
-      await emailPasswordSignIn(email, password) // Pass email and password to sign-in function
+      await login(email, password) // Use login from AuthContext
       navigate('/dashboard') // Navigate to the dashboard after successful login
     } catch (error) {
       setError(error.message) // Display error message on login failure
