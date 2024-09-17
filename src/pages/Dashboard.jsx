@@ -5,6 +5,7 @@ import { ref, get } from 'firebase/database' // Import Firebase database functio
 import { database } from '../firebase/firebase' // Import the database instance
 import Modal from '../components/UI/Modal'; // Import the Modal component ADDEDD
 
+
 const Dashboard = () => {
   const navigate = useNavigate()
   const [usersData, setUsersData] = useState(null)
@@ -100,6 +101,7 @@ const Dashboard = () => {
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const currentItems = sortedUsers.slice(startIndex, startIndex + itemsPerPage);
+  
 
   if (!usersData) {
     return <div className="text-center">Loading...</div>;
@@ -111,47 +113,53 @@ const Dashboard = () => {
 
       {/* Search Input Field */}
       <div className="mb-4">
+        <label className="block text-gray-700 font-bold mb-2" htmlFor="search">
+          Search Student
+        </label>
         <input
+          id="search"
           type="text"
           placeholder="Search by name"
           value={searchQuery}
           onChange={handleSearchChange}
-          className="px-4 py-2 border border-gray-300 rounded"
+          className="px-4 py-2 border border-gray-300 rounded w-full"
         />
       </div>
 
-      {/* Section Dropdown Menu */}
-      <div className="mb-4">
-        <label htmlFor="section" className="mr-2">Filter by Section:</label>
-        <select
-          id="section"
-          value={selectedSection}
-          onChange={handleSectionChange}
-          className="px-4 py-2 border border-gray-300 rounded"
-        >
-          <option value="">All Sections</option>
-          {uniqueSections.map(section => (
-            <option key={section} value={section}>Section {section}</option>
-          ))}
-        </select>
-      </div>
+      <div className="mb-4 flex items-center space-x-4">
+        {/* Section Dropdown Menu */}
+        <div className="flex items-center">
+          <label htmlFor="section" className="mr-2">Filter by Section:</label>
+          <select
+            id="section"
+            value={selectedSection}
+            onChange={handleSectionChange}
+            className="px-4 py-2 border border-gray-300 rounded"
+          >
+            <option value="">All Sections</option>
+            {uniqueSections.map(section => (
+              <option key={section} value={section}>Section {section}</option>
+            ))}
+          </select>
+        </div>
 
-      {/* Items per Page Dropdown */}
-      <div className="mb-4">
-        <label htmlFor="itemsPerPage" className="mr-2">Items per Page:</label>
-        <select
-          id="itemsPerPage"
-          value={itemsPerPage}
-          onChange={handleItemsPerPageChange}
-          className="px-4 py-2 border border-gray-300 rounded"
-        >
-          <option value={10}>10</option>
-          <option value={20}>20</option>
-          <option value={30}>30</option>
-          <option value={50}>50</option>
-        </select>
+        {/* Items per Page Dropdown */}
+        <div className="flex items-center">
+          <label htmlFor="itemsPerPage" className="mr-2">Items per Page:</label>
+          <select
+            id="itemsPerPage"
+            value={itemsPerPage}
+            onChange={handleItemsPerPageChange}
+            className="px-4 py-2 border border-gray-300 rounded"
+          >
+            <option value={10}>10</option>
+            <option value={20}>20</option>
+            <option value={30}>30</option>
+            <option value={50}>50</option>
+          </select>
+        </div>
       </div>
-
+      
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead>
@@ -199,7 +207,7 @@ const Dashboard = () => {
             {currentItems.map(([userId, user]) => (
               <tr key={userId}>
                 <td className="px-6 py-4 whitespace-nowrap">{user.profile?.name || 'No name available'}</td>
-                <td className="px-6 py-4 whitespace-nowrap">{user.profile?.section || 'No section available'}</td>
+                <td className="px-6 py-4 whitespace-nowrap">{user.profile?.section || 'N/A'}</td>
                 <td className="px-6 py-4 whitespace-nowrap">{user.stats?.computerHistory || 'N/A'}</td>
                 <td className="px-6 py-4 whitespace-nowrap">{user.stats?.computerElements || 'N/A'}</td>
                 <td className="px-6 py-4 whitespace-nowrap">{user.stats?.numberSystem || 'N/A'}</td>
@@ -266,7 +274,7 @@ const Dashboard = () => {
               <tr><td className="px-4 py-2 border">Intro Programming:</td><td className="px-4 py-2 border">{selectedUser.stats?.introProgramming || 'N/A'}</td></tr>
               <tr><td className="px-4 py-2 border">Intro Programming Unlocked:</td><td className="px-4 py-2 border">{selectedUser.stats?.isIntroProgrammingUnlocked ? 'Yes' : 'No'}</td></tr>
               <tr><td className="px-4 py-2 border">Number System Unlocked:</td><td className="px-4 py-2 border">{selectedUser.stats?.isNumberSystemUnlocked ? 'Yes' : 'No'}</td></tr>
-              <tr><td className="px-4 py-2 border">Need Welcome:</td><td className="px-4 py-2 border">{selectedUser.stats?.needWelcome ? 'Yes' : 'No'}</td></tr>
+              <tr><td className="px-4 py-2 border">Newly Created User:</td><td className="px-4 py-2 border">{selectedUser.stats?.needWelcome ? 'Yes' : 'No'}</td></tr>
             </tbody>
           </table>
 
