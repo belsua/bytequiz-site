@@ -24,6 +24,11 @@ const Dashboard = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
+  const [searchDate, setSearchDate] = useState(''); // State for search date
+  
+  const [isActivityModalOpen, setIsActivityModalOpen] = useState(false)
+
+
 
   // Fetch all users' data from Firebase
   useEffect(() => {
@@ -58,6 +63,17 @@ const Dashboard = () => {
     setIsModalOpen(false);
     setSelectedUser(null);
   };
+
+  const openActivityModal = (user) => {
+    setSelectedUser(user);
+    setIsActivityModalOpen(true);
+  }
+
+  const closeActivityModal = () => {
+    setSelectedUser(null);
+    setIsActivityModalOpen(false);
+    setSearchDate(''); // Clear the search date bug
+  }
 
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value.toLowerCase());
@@ -279,12 +295,20 @@ const Dashboard = () => {
                   {user.stats?.introProgramming || 'N/A'}
                 </td>
                 <td className="px-6 py-4">
-                  <button
-                    onClick={() => openModal(user)}
-                    className="font-medium text-blue-600 hover:underline"
-                  >
-                    View Details
-                  </button>
+                  <div className="inline-flex rounded-md shadow-sm" role="group">
+                    <button
+                      onClick={() => openModal(user)}
+                      className="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-300 rounded-l-lg hover:bg-gray-100 hover:text-blue-600 focus:z-10 focus:ring-2 focus:ring-blue-500 focus:text-blue-600"
+                    >
+                      View Details
+                    </button>
+                    <button
+                      onClick={() => openActivityModal(user)}
+                      className="px-4 py-2 text-sm font-medium text-gray-900 bg-white border-t border-b border-gray-300 rounded-r-lg hover:bg-gray-100 hover:text-blue-600 focus:z-10 focus:ring-2 focus:ring-blue-500 focus:text-blue-600"
+                    >
+                      View Activity
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
@@ -315,10 +339,11 @@ const Dashboard = () => {
         </div>
       </div>
 
+      {/* Details Modal */}
       {isModalOpen && selectedUser && (
         <Modal onClose={closeModal}>
           <div className="p-6 bg-white rounded-lg shadow-lg">
-            <h2 className="text-2xl font-bold mb-4">User Details</h2>
+            <h2 className="text-2xl font-bold mb-4">{selectedUser.profile?.username || 'Player'} Details</h2>
 
             <h3 className="text-xl font-semibold mb-2">Profile</h3>
             <table className="min-w-full mb-4 border border-gray-300">
@@ -344,6 +369,30 @@ const Dashboard = () => {
                 <tr><td className="px-4 py-2 border">Newly Created User:</td><td className="px-4 py-2 border">{selectedUser.stats?.needWelcome ? 'Yes' : 'No'}</td></tr>
               </tbody>
             </table>
+          </div>
+        </Modal>
+      )}
+
+      {/* Activity Modal */}
+      {isActivityModalOpen && selectedUser && (
+        <Modal onClose={closeActivityModal}>
+          <div className="p-6 bg-white rounded-lg shadow-lg">
+            <h2 className="text-2xl font-bold mb-4">{selectedUser.profile?.username || 'Player'} Activity Details </h2>
+
+            <form className="mb-4">
+              <label className="block text-gray-700 font-bold mb-2" htmlFor="date-search">
+                Search by Date:
+              </label>
+              <input
+                type="date"
+                id="date-search"
+                value={searchDate}
+                onChange={e => setSearchDate(e.target.value)}
+                className="block w-full p-2 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Select date"
+              />
+            </form>
+
 
             <h3 className="text-xl font-semibold mb-2">Activities</h3>
             {selectedUser.activities ? (
@@ -359,16 +408,21 @@ const Dashboard = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {Object.entries(selectedUser.activities).map(([activityId, activity]) => (
-                    <tr key={activityId} className="odd:bg-white even:bg-gray-50">
-                      <td className="px-4 py-2 border">{activity['date-time']}</td>
-                      <td className="px-4 py-2 border">{activity.minigame || 'N/A'}</td>
-                      <td className="px-4 py-2 border">{activity.mode || 'N/A'}</td>
-                      <td className="px-4 py-2 border">{activity.topic || 'N/A'}</td>
-                      <td className="px-4 py-2 border">{activity.score || 'N/A'}</td>
-                      <td className="px-4 py-2 border">{activity.players ? activity.players.join(', ') : 'No players available'}</td>
-                    </tr>
-                  ))}
+                  {Object.entries(selectedUser.activities)
+                    .filter(([activityId, activity]) => {
+                      const activityDate = new Date(activity['date-time']).toISOString().split('T')[0];
+                      return searchDate ? activityDate === searchDate : true;
+                    })
+                    .map(([activityId, activity]) => (
+                      <tr key={activityId} className="odd:bg-white even:bg-gray-50">
+                        <td className="px-4 py-2 border">{activity['date-time']}</td>
+                        <td className="px-4 py-2 border">{activity.minigame || 'N/A'}</td>
+                        <td className="px-4 py-2 border">{activity.mode || 'N/A'}</td>
+                        <td className="px-4 py-2 border">{activity.topic || 'N/A'}</td>
+                        <td className="px-4 py-2 border">{activity.score || 'N/A'}</td>
+                        <td className="px-4 py-2 border">{activity.players ? activity.players.join(', ') : 'No players available'}</td>
+                      </tr>
+                    ))}
                 </tbody>
               </table>
             ) : (
@@ -377,6 +431,7 @@ const Dashboard = () => {
           </div>
         </Modal>
       )}
+
     </div>
   );
 
