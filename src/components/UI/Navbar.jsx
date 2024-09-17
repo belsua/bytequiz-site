@@ -1,12 +1,14 @@
 // src/components/UI/Navbar.jsx
-import React from 'react'
-import { useNavigate } from 'react-router-dom'
+import React, { useContext } from 'react'
+import { useNavigate, Link } from 'react-router-dom'
+import { AuthContext } from '../../contexts/AuthContext' // Import AuthContext
 
-const Navbar = ({ user, handleSignOut }) => {
-  const navigate = useNavigate() // useNavigate inside the Navbar component
+const Navbar = () => {
+  const navigate = useNavigate()
+  const { user, logout } = useContext(AuthContext) // Access user and logout from AuthContext
 
   const handleLogout = async () => {
-    await handleSignOut() // Call the sign-out function from App
+    await logout() // Call the logout function from AuthContext
     navigate('/') // Redirect to home after sign-out
   }
 
@@ -16,15 +18,19 @@ const Navbar = ({ user, handleSignOut }) => {
         <a href="/" className="text-xl font-bold">
           ByteQuiz
         </a>
-        <div>
-          {user ? (
-            <div className="flex items-center">
+        <div className="flex items-center gap-4">
+          {user && (
+            <>
+              <Link to="/dashboard" className="bg-blue-500 px-4 py-2 rounded">
+                Dashboard
+              </Link>
               <p className="mr-4">Hello, {user.email}</p>
               <button onClick={handleLogout} className="bg-red-500 px-4 py-2 rounded">
                 Sign Out
               </button>
-            </div>
-          ) : (
+            </>
+          )}
+          {!user && (
             <a href="/login" className="bg-green-500 px-4 py-2 rounded">
               Sign In
             </a>
