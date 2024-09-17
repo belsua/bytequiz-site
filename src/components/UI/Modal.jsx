@@ -9,7 +9,7 @@ const Modal = ({ onClose, children }) => {
         <div className="flex justify-end p-4">
           <button
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-800"
+            className="text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm p-2.5 me-2 mb-2"
           >
             Close
           </button>

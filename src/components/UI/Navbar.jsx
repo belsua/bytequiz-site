@@ -24,7 +24,7 @@ const Navbar = () => {
               <Link to="/dashboard" className="bg-blue-500 px-4 py-2 rounded">
                 Dashboard
               </Link>
-              <p className="mr-4">Hello, {user.email}</p>
+              {/* <p className="mr-4">Hello, {user.email}</p> */}
               <button onClick={handleLogout} className="bg-red-500 px-4 py-2 rounded">
                 Sign Out
               </button>
