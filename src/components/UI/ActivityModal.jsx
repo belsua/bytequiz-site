@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Modal from './Modal';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
@@ -12,19 +12,21 @@ const ActivityModal = ({ onClose, selectedUser, ...props }) => {
   const [sortActivityColumn, setActivitySortColumn] = React.useState('date-time');
   const [currentPage, setCurrentPage] = React.useState(1);
   const [itemsPerPage, setItemsPerPage] = React.useState(10);
+  const [selectedActivityId, setSelectedActivityId] = React.useState(null);
+  const [isActivityDetailsModalOpen, setIsActivityDetailsModalOpen] = React.useState(false);
 
-    const filteredActivities = Object.entries(selectedUser.activities)
+  const filteredActivities = Object.entries(selectedUser.activities)
     .filter(([activityId, activity]) => {
-    const activityDate = new Date(activity['date-time']).toISOString().split('T')[0];
-    return (
+      const activityDate = new Date(activity['date-time']).toISOString().split('T')[0];
+      return (
         (searchDate ? activityDate === searchDate : true) &&
         (selectedMode ? activity.mode === selectedMode : true) &&
         (selectedTopic ? activity.topic === selectedTopic : true) &&
         (selectedMinigame ? activity.minigame === selectedMinigame : true)
-    );
+      );
     });
 
-    const totalPages = Math.ceil(filteredActivities.length / itemsPerPage);
+  const totalPages = Math.ceil(filteredActivities.length / itemsPerPage);
 
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
@@ -103,7 +105,10 @@ const ActivityModal = ({ onClose, selectedUser, ...props }) => {
     setSelectedMinigame(minigame);
   };
 
-  
+  const handleViewActivityQuestion = (activityId) => {
+    setSelectedActivityId(activityId);
+    setIsActivityDetailsModalOpen(true);
+  };
 
   return (
     <Modal onClose={onClose}>
@@ -171,7 +176,7 @@ const ActivityModal = ({ onClose, selectedUser, ...props }) => {
 
           <div className="flex items-center">
             <label htmlFor="topic" className="mr-2">Filter by Topic:</label>
-            <Menu as="div" className="relative inline -block text-left">
+            <Menu as="div" className="relative inline-block text-left">
               <div>
                 <MenuButton className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
                   {selectedTopic || 'All Topics'}
@@ -230,7 +235,7 @@ const ActivityModal = ({ onClose, selectedUser, ...props }) => {
           </div>
 
           <div className="flex items-center">
-            <label htmlFor="min igame" className="mr-2">Filter by Minigame:</label>
+            <label htmlFor="minigame" className="mr-2">Filter by Minigame:</label>
             <Menu as="div" className="relative inline-block text-left">
               <div>
                 <MenuButton className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
@@ -379,17 +384,26 @@ const ActivityModal = ({ onClose, selectedUser, ...props }) => {
                 >
                   Players {sortActivityColumn === 'players' ? (sortActivityOrder === 'asc' ? '↑' : '↓') : ''}
                 </th>
+                <th className="px-4 py-2">Action</th>
               </tr>
             </thead>
             <tbody>
               {paginatedActivities.map(([activityId, activity]) => (
                 <tr key={activityId} className="odd:bg-white even:bg-gray-50">
-                  <td className="px- 4 py-2 border">{activity['date-time']}</td>
+                  <td className="px-4 py-2 border">{activity['date-time']}</td>
                   <td className="px-4 py-2 border">{activity.minigame || 'N/A'}</td>
                   <td className="px-4 py-2 border">{activity.mode || 'N/A'}</td>
                   <td className="px-4 py-2 border">{activity.topic || 'N/A'}</td>
                   <td className="px-4 py-2 border">{activity.score || 'N/A'}</td>
                   <td className="px-4 py-2 border">{activity.players ? activity.players.join(', ') : 'No players available'}</td>
+                  <td className="px-4 py-2 border">
+                    <button
+                      onClick={() => handleViewActivityQuestion(activityId)}
+                      className="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-300 rounded hover:bg-gray-100 hover:text-blue-600 focus:z-10 focus:ring-2 focus:ring-blue-500 focus:text-blue-600"
+                    >
+                      View Activity Question
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -398,8 +412,62 @@ const ActivityModal = ({ onClose, selectedUser, ...props }) => {
           <p>No activities data available</p>
         )}
       </div>
+
+      {isActivityDetailsModalOpen && (
+        <ActivityDetailsModal
+          onClose={() => setIsActivityDetailsModalOpen(false)}
+          activityId={selectedActivityId}
+          selectedUser={selectedUser}
+        />
+      )}
     </Modal>
   );
+};
+
+const ActivityDetailsModal = ({ onClose, activityId, selectedUser }) => {
+    const activity = selectedUser.activities[activityId];
+  
+    if (!activity || !activity.questions) {
+      return (
+        <Modal onClose={onClose}>
+          <div className="p-6 bg-white rounded-lg shadow-lg">
+            <h2 className="text-2xl font-bold mb-4">Activity Details</h2>
+            <p>No available question data</p>
+          </div>
+        </Modal>
+      );
+    }
+  
+    return (
+      <Modal onClose={onClose}>
+        <div className="p-6 bg-white rounded-lg shadow-lg">
+          <h2 className="text-2xl font-bold mb-4">Activity Details</h2>
+  
+          <table className="w-full mb-4 border border-gray-300">
+            <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+              <tr>
+                <th className="px-4 py-2">Question</th>
+                <th className="px-4 py-2">Point</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Object.entries(activity.questions).map(([questionId, question]) => (
+                <tr key={questionId} className="odd:bg-white even:bg-gray-50">
+                  <td className="px-4 py-2 border">{question.question}</td>
+                  <td
+                    className={`px-4 py-2 border ${
+                      question.correct ? 'text-green-600' : 'text-red-600'
+                    }`}
+                  >
+                    {question.correct ? 'Correct' : 'Wrong'}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Modal>
+    );
 };
 
 export default ActivityModal;

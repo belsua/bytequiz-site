@@ -331,7 +331,6 @@ const Dashboard = () => {
           <div className="p-6 bg-white rounded-lg shadow-lg">
             <h2 className="text-2xl font-bold mb-4">{selectedUser.profile?.username || 'Player'} Details</h2>
 
-
             <h3 className="text-xl font-semibold mb-2">Profile</h3>
             <table className="min-w-full mb-4 border border-gray-300">
               <tbody>
