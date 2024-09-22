@@ -32,6 +32,14 @@ const HeroSection = () => {
                         Watch video
                     </a>  
                 </div>
+                <p 
+                    className="absolute bottom-4 right-4 text-xs text-white opacity-10"
+                    style={{
+                        zIndex: 1
+                    }}
+                >
+                    BG by Mariana Salimena
+                </p>
             </div>
         </div>
     </section>
