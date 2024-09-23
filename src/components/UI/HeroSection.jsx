@@ -13,7 +13,7 @@ const HeroSection = () => {
                 backgroundPosition: 'center'
             }}
         >        
-            <div className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-16">
+            <div className="max-w-[85rem] h-screen mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-4">
             <div className="py-8 px-4 mx-auto max-w-screen-xl text-center lg:py-16 lg:px-12 relative">
                 {/* rest of the code remains the same */}
                 <a href="#" className="inline-flex justify-between items-center py-1 px-1 pr-4 mb-7 text-sm text-blue-700 bg-blue-100 rounded-full hover:bg-blue-200" role="alert">
