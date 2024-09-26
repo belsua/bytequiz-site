@@ -131,6 +131,39 @@ const ActivityModal = ({ onClose, selectedUser, ...props }) => {
 
         <div className="mb-4 flex items-center space-x-4">
           <div className="flex items-center">
+            <label htmlFor="itemsPerPage" className="mr-2">Items per Page:</label>
+            <Menu as="div" className="relative inline-block text-left">
+              <div>
+                <MenuButton className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+                  {itemsPerPage}
+                  <ChevronDownIcon aria-hidden="true" className="-mr-1 h-5 w-5 text-gray-400" />
+                </MenuButton>
+              </div>
+
+              <MenuItems
+                transition
+                className="absolute right-0 z-10 mt-2 w-auto min-w-[150px] max-w-[300px] origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
+              >
+                <div className="py-1">
+                  {[10, 20, 30, 50].map(count => (
+                    <MenuItem key={count}>
+                      <button
+                        onClick={() => {
+                          setItemsPerPage(count);
+                          setCurrentPage(1);
+                        }}
+                        className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      >
+                        {count}
+                      </button>
+                    </MenuItem>
+                  ))}
+                </div>
+              </MenuItems>
+            </Menu>
+          </div>
+
+          <div className="flex items-center">
             <label htmlFor="mode" className="mr-2">Filter by Mode:</label>
             <Menu as="div" className="relative inline-block text-left">
               <div>
@@ -287,63 +320,6 @@ const ActivityModal = ({ onClose, selectedUser, ...props }) => {
           </div>
         </div>
 
-        <h3 className="text-xl font-semibold mb-2">Activities</h3>
-
-        <div className="flex items-center">
-          <label htmlFor="itemsPerPage" className="mr-2">Items per Page:</label>
-          <Menu as="div" className="relative inline-block text-left">
-            <div>
-              <MenuButton className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
-                {itemsPerPage}
-                <ChevronDownIcon aria-hidden="true" className="-mr-1 h-5 w-5 text-gray-400" />
-              </MenuButton>
-            </div>
-
-            <MenuItems
-              transition
-              className="absolute right-0 z-10 mt-2 w-auto min-w-[150px] max-w-[300px] origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
-            >
-              <div className="py-1">
-                {[10, 20, 30, 50].map(count => (
-                  <MenuItem key={count}>
-                    <button
-                      onClick={() => {
-                        setItemsPerPage(count);
-                        setCurrentPage(1);
-                      }}
-                      className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    >
-                      {count}
-                    </button>
-                  </MenuItem>
-                ))}
-              </div>
-            </MenuItems>
-          </Menu>
-        </div>
-
-        <div className="mt-4 flex justify-between items-center mb-2">
-          <div>
-            <span>Page {currentPage} of {totalPages}</span>
-          </div>
-          <div>
-            <button
-              onClick={() => handlePageChange(currentPage - 1)}
-              disabled={currentPage === 1}
-              className="px-4 py-2 bg-blue-500 text-white rounded mr-2 disabled:bg-gray-400"
-            >
-              Previous
-            </button>
-            <button
-              onClick={() => handlePageChange(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              className="px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-400"
-            >
-              Next
-            </button>
-          </div>
-        </div>
-
         {paginatedActivities.length > 0 ? (
           <table className="w-full mb-4 border border-gray-300">
             <thead className="text-xs text-gray-700 uppercase bg-gray-50">
@@ -420,6 +396,28 @@ const ActivityModal = ({ onClose, selectedUser, ...props }) => {
           selectedUser={selectedUser}
         />
       )}
+
+      <div className="mt-4 flex justify-between items-center mb-2">
+        <div>
+          <span>Page {currentPage} of {totalPages}</span>
+        </div>
+        <div>
+          <button
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="px-4 py-2 bg-blue-500 text-white rounded mr-2 disabled:bg-gray-400"
+          >
+            Previous
+          </button>
+          <button
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className="px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-400"
+          >
+            Next
+          </button>
+        </div>
+      </div>
     </Modal>
   );
 };

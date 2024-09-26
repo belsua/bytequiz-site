@@ -2,7 +2,7 @@ import React from 'react';
 
 const FeaturesSection = () => {
     return (
-        <section className="pb-16 pt-16">
+        <section className="pb-16 pt-16" id="Features">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="mb-14 text-center">
                 <span

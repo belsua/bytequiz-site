@@ -5,18 +5,18 @@ import backgroundImage from '../../assets/Sample.webp'
 
 const HeroSection = () => {
     return (
-        <section 
+        <section
             className="relative overflow-hidden"
+            id="HeroSection"
             style={{
                 backgroundImage: `url(${backgroundImage})`,
                 backgroundSize: 'cover',
                 backgroundPosition: 'center'
             }}
         >        
-            <div className="max-w-[85rem] h-screen mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-4">
-            <div className="py-8 px-4 mx-auto max-w-screen-xl text-center lg:py-16 lg:px-12 relative">
-                {/* rest of the code remains the same */}
-                <a href="#" className="inline-flex justify-between items-center py-1 px-1 pr-4 mb-7 text-sm text-blue-700 bg-blue-100 rounded-full hover:bg-blue-200" role="alert">
+            <div className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-16">
+            <div className="py-8 px-4 mx-auto max-w-screen-xl text-center lg:py-16 lg:px-12 lg:content-center relative">
+                <a href="#Features" className="inline-flex justify-between items-center py-1 px-1 pr-4 mb-7 text-sm text-blue-700 bg-blue-100 rounded-full hover:bg-blue-200" role="alert">
                 <span className="text-xs bg-blue-600 rounded-full text-white px-4 py-1.5 mr-3">New</span> <span className="text-sm font-medium">ByteQuiz is out! See what's new</span> 
                 <svg className="ml-2 w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path></svg>
                 </a>
