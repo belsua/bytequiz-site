@@ -4,11 +4,12 @@ import { useNavigate, Link } from 'react-router-dom'
 import { AuthContext } from '../../contexts/AuthContext' // Import AuthContext
 import Logo from '../../assets/Logo.webp'
 
+
 const Navbar = () => {
   const navigate = useNavigate()
   const { user, logout } = useContext(AuthContext) // Access user and logout from AuthContext
-
   const [showNav, setShowNav] = useState(false) // Add a state to track the visibility of the navigation links
+
 
   const handleLogout = async () => {
     await logout() // Call the logout function from AuthContext
@@ -18,6 +19,7 @@ const Navbar = () => {
   const handleToggleNav = () => {
     setShowNav(!showNav) // Toggle the visibility of the navigation links
   }
+
 
   return (
     <nav className="bg-black/85 p-4 text-white sticky top-0 left-0 right-0 z-10 backdrop-blur-xl">

@@ -13,6 +13,7 @@ const Login = () => {
   const { login } = useContext(AuthContext) // Access the login function from AuthContext
   const navigate = useNavigate()
 
+
   const handleSubmit = async e => {
     e.preventDefault()
     try {

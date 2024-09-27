@@ -16,31 +16,22 @@ const ActivityModal = ({ onClose, selectedUser, ...props }) => {
   const [isActivityDetailsModalOpen, setIsActivityDetailsModalOpen] = React.useState(false);
 
   const filteredActivities = Object.entries(selectedUser.activities)
-    .filter(([activityId, activity]) => {
-      const activityDate = new Date(activity['date-time']).toISOString().split('T')[0];
-      return (
-        (searchDate ? activityDate === searchDate : true) &&
-        (selectedMode ? activity.mode === selectedMode : true) &&
-        (selectedTopic ? activity.topic === selectedTopic : true) &&
-        (selectedMinigame ? activity.minigame === selectedMinigame : true)
-      );
-    });
+  .filter(([activityId, activity]) => {
+    const activityDate = new Date(activity['date-time']).toISOString().split('T')[0];
+    return (
+      (searchDate ? activityDate === searchDate : true) &&
+      (selectedMode ? activity.mode === selectedMode : true) &&
+      (selectedTopic ? activity.topic === selectedTopic : true) &&
+      (selectedMinigame ? activity.minigame === selectedMinigame : true)
+    );
+  });
 
   const totalPages = Math.ceil(filteredActivities.length / itemsPerPage);
 
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
 
-  const paginatedActivities = Object.entries(selectedUser.activities)
-    .filter(([activityId, activity]) => {
-      const activityDate = new Date(activity['date-time']).toISOString().split('T')[0];
-      return (
-        (searchDate ? activityDate === searchDate : true) &&
-        (selectedMode ? activity.mode === selectedMode : true) &&
-        (selectedTopic ? activity.topic === selectedTopic : true) &&
-        (selectedMinigame ? activity.minigame === selectedMinigame : true)
-      );
-    })
+  const paginatedActivities = filteredActivities
     .sort((a, b) => {
       let aValue, bValue;
 
@@ -80,11 +71,12 @@ const ActivityModal = ({ onClose, selectedUser, ...props }) => {
 
   const handleItemsPerPageChange = (event) => {
     setItemsPerPage(parseInt(event.target.value, 10));
-    setCurrentPage(1);
+    setCurrentPage(pageNumber);
   };
 
   const handleSearchChange = (event) => {
     setSearchDate(event.target.value);
+    setCurrentPage(pageNumber);
   };
 
   const handleActivitySort = (column) => {
@@ -95,14 +87,17 @@ const ActivityModal = ({ onClose, selectedUser, ...props }) => {
 
   const handleModeChange = (mode) => {
     setSelectedMode(mode);
+    setCurrentPage(pageNumber);
   };
 
   const handleTopicChange = (topic) => {
     setSelectedTopic(topic);
+    setCurrentPage(pageNumber);
   };
 
   const handleMinigameChange = (minigame) => {
     setSelectedMinigame(minigame);
+    setCurrentPage(pageNumber);
   };
 
   const handleViewActivityQuestion = (activityId) => {
@@ -134,7 +129,10 @@ const ActivityModal = ({ onClose, selectedUser, ...props }) => {
             <label htmlFor="itemsPerPage" className="mr-2">Items per Page:</label>
             <Menu as="div" className="relative inline-block text-left">
               <div>
-                <MenuButton className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+                <MenuButton 
+                  className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 disabled:opacity-40"
+                  disabled={paginatedActivities.length === 0}
+                  >
                   {itemsPerPage}
                   <ChevronDownIcon aria-hidden="true" className="-mr-1 h-5 w-5 text-gray-400" />
                 </MenuButton>
@@ -404,14 +402,14 @@ const ActivityModal = ({ onClose, selectedUser, ...props }) => {
         <div>
           <button
             onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1}
+            disabled={currentPage === 1 || paginatedActivities.length === 0}
             className="px-4 py-2 bg-blue-500 text-white rounded mr-2 disabled:bg-gray-400"
           >
             Previous
           </button>
           <button
             onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
+            disabled={currentPage === totalPages || paginatedActivities.length === 0}
             className="px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-400"
           >
             Next

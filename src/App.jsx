@@ -10,6 +10,7 @@ import ProtectedRoute from './components/ProtectedRoute'
 import NotFoundPage from './components/UI/NotFoundPage'
 import { AuthProvider } from './contexts/AuthContext'
 
+
 function App() {
   return (
     <AuthProvider>

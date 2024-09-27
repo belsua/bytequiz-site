@@ -12,7 +12,7 @@ const PhoneMockupSection = () => {
         {/* <div className="h-[46px] w-[3px] bg-gray-800 dark:bg-gray-800 absolute -start-[17px] top-[178px] rounded-s-lg"></div> */}
         {/* <div className="h-[64px] w-[3px] bg-gray-800 dark:bg-gray-800 absolute -end-[17px] top-[142px] rounded-e-lg"></div> */}
         <div className="rounded-[2rem] overflow-hidden max-w-[572px] max-h-[272px] bg-white dark:bg-gray-800">
-          <img src={ByteQuizMockup} className="w-full h-full object-contain" alt="" />
+          <img src={ByteQuizMockup} className="w-full h-full object-contain" alt="ByteQuiz Phone Mockup" />
         </div>
       </div>
     </section>
