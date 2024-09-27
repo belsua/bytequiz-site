@@ -382,9 +382,9 @@ const ActivityModal = ({ onClose, selectedUser, ...props }) => {
               ))}
             </tbody>
           </table>
-        ) : (
-          <p>No activities data available</p>
-        )}
+      ) : (
+        <p>No activities data available</p>
+      )}
       </div>
 
       {isActivityDetailsModalOpen && (
