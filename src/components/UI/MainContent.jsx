@@ -5,6 +5,7 @@ import FeaturesSection from './FeaturesSection';
 import SingleplayShowcase from './SingleplayShowcase.jsx';
 import MultiplayerShowcase from './MultiplayerShowcase.jsx';
 import Questions from './Questions.jsx';
+import Footer from './Footer.jsx';
 
 const MainContent = () => {
   return (
@@ -15,6 +16,7 @@ const MainContent = () => {
       <SingleplayShowcase/>
       <MultiplayerShowcase/>
       <Questions/>
+      <Footer />
     </section>
   );
 };
