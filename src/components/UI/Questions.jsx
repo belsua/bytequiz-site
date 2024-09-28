@@ -53,7 +53,7 @@ const Questions = () => {
                       handleAccordion('basic-collapse-one-with-arrow-always-open')
                     }
                   >
-                    <span>How can I download the game on my device?</span>
+                    <span className="text-left">How can I download the game on my device?</span>
                     <svg
                       data-accordion-icon
                       className={`w-3 h-3 rotate-180 shrink-0 ${
@@ -114,7 +114,7 @@ const Questions = () => {
                       handleAccordion('basic-collapse-two-with-arrow-always-open')
                     }
                   >
-                    <span>How do I start playing the game?</span>
+                    <span className="text-left">How do I start playing the game?</span>
                     <svg
                       data-accordion-icon
                       className={`w-3 h-3 rotate-180 shrink-0 ${
@@ -175,7 +175,7 @@ const Questions = () => {
                       handleAccordion('basic-collapse-three-with-arrow-always-open')
                     }
                   >
-                    <span>Can my instructor track my progress in the game?</span>
+                    <span className="text-left">Can my instructor track my progress in the game?</span>
                     <svg
                       data-accordion-icon
                       className={`w-3 h-3 rotate-180 shrink-0 ${
@@ -236,7 +236,7 @@ const Questions = () => {
                       handleAccordion('basic-collapse-four-with-arrow-always-open')
                     }
                   >
-                    <span>How can I play with my classmates?</span>
+                    <span className="text-left">How can I play with my classmates?</span>
                     <svg
                       data-accordion-icon
                       className={`w-3 h-3 rotate-180 shrink-0 ${
