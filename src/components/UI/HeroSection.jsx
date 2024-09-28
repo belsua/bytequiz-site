@@ -31,7 +31,7 @@ const HeroSection = () => {
                 <img src={Logo} alt="Logo" className="mb-4 mx-auto w-3/4 sm:w-2/3 lg:w-2/3 xl:w-3/4" />
                 <p className="mb-8 text-lg font-normal text-white lg:text-xl sm:px-16 xl:px-48">ByteQuiz brings improvements on academic performance by introducing gamification to enhance engagement and supplement your knowledge on educational lessons.</p>
                 <div className="flex flex-col mb-8 lg:mb-16 space-y-4 sm:flex-row sm:justify-center sm:space-y-0 sm:space-x-4">
-                    <a href="#" className="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center text-white rounded-lg bg-blue-600 hover:bg-blue-700">
+                    <a href="https://github.com/belsua/ByteQuiz/releases/download/v1.1.1/bytequiz-1.1.1.apk" className="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center text-white rounded-lg bg-blue-600 hover:bg-blue-700">
                         Download for Android
                         <svg className="ml-2 -mr-1 w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
                     </a>
