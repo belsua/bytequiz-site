@@ -428,49 +428,50 @@ const ActivityModal = ({ onClose, selectedUser, ...props }) => {
 };
 
 const ActivityDetailsModal = ({ onClose, activityId, selectedUser }) => {
-    const activity = selectedUser.activities[activityId];
-  
-    if (!activity || !activity.questions) {
-      return (
-        <Modal onClose={onClose}>
-          <div className="p-6 bg-white rounded-lg shadow-lg">
-            <h2 className="text-2xl font-bold mb-4">Activity Details</h2>
-            <p>No available question data</p>
-          </div>
-        </Modal>
-      );
-    }
-  
+  const activity = selectedUser.activities[activityId];
+
+  if (!activity || !activity.questions) {
     return (
       <Modal onClose={onClose}>
-        <div className="relative overflow-x-auto shadow-md sm:rounded-lg p-4">
-          <h2 className="text-2xl font-bold mb-4 mt-4 px-4">Activity Details</h2>
-  
-          <table className="w-full mb-4 border border-gray-300">
-            <thead className="text-xs text-gray-700 uppercase bg-gray-50">
-              <tr>
-                <th className="px-4 py-2">Question</th>
-                <th className="px-4 py-2">Point</th>
-              </tr>
-            </thead>
-            <tbody>
-              {Object.entries(activity.questions).map(([questionId, question]) => (
-                <tr key={questionId} className="odd:bg-white even:bg-gray-50">
-                  <td className="px-4 py-2 border">{question.question}</td>
-                  <td
-                    className={`px-4 py-2 border ${
-                      question.correct ? 'text-green-600' : 'text-red-600'
-                    }`}
-                  >
-                    {question.correct ? 'Correct' : 'Wrong'}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="p-6 bg-white rounded-lg shadow-lg">
+          <h2 className="text-2xl font-bold mb-4">Activity Details</h2>
+          <p>No available question data</p>
         </div>
       </Modal>
     );
+  }
+
+  const isRunnerMinigame = activity.minigame === 'Runner';
+
+  return (
+    <Modal onClose={onClose}>
+      <div className="relative overflow-x-auto shadow-md sm:rounded-lg p-4">
+        <h2 className="text-2xl font-bold mb-4 mt-4 px-4">Activity Details</h2>
+
+        <table className="w-full mb-4 border border-gray-300">
+          <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+            <tr>
+              <th className="px-4 py-2">Question</th>
+              <th className="px-4 py-2">{isRunnerMinigame ? 'Wrong Attempts' : 'Point'}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {Object.entries(activity.questions).map(([questionId, question]) => (
+              <tr key={questionId} className="odd:bg-white even:bg-gray-50">
+                <td className="px-4 py-2 border">{question.question}</td>
+                <td className={`px-4 py-2 border ${
+                      isRunnerMinigame ? (question.attempts === 0 ? 'text-green-600' : 'text-red-600') : 
+                      (question.correct ? 'text-green-600' : 'text-red-600')
+                    }`}>
+                  {isRunnerMinigame ? question.attempts : (question.correct ? 'Correct' : 'Wrong')}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </Modal>
+  );
 };
 
 export default ActivityModal;
