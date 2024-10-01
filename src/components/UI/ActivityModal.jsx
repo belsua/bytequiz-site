@@ -107,21 +107,28 @@ const ActivityModal = ({ onClose, selectedUser, ...props }) => {
 
   return (
     <Modal onClose={onClose}>
-      <div className="p-6 bg-white rounded-lg shadow-lg">
+      <div className="bg-white rounded-lg shadow-lg container mx-auto p-6">
         <h2 className="text-2xl font-bold mb-4">{selectedUser.profile?.username || 'Player'} Activity Details </h2>
 
         <form className="mb-4">
           <label className="block text-gray-700 font-bold mb-2" htmlFor="date-search">
             Search by Date:
           </label>
-          <input
-            type="date"
-            id="date-search"
-            value={searchDate}
-            onChange={handleSearchChange}
-            className="block w-full p-2 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
-            placeholder="Select date"
-          />
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+              <svg className="w-5 h-5 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
+              </svg>
+            </div>
+            <input
+              type="date"
+              id="date-search"
+              value={searchDate}
+              onChange={handleSearchChange}
+              className="block w-full p-4 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Select date"
+            />
+        </div>
         </form>
 
         <div className="mb-4 flex items-center space-x-4">
@@ -421,49 +428,50 @@ const ActivityModal = ({ onClose, selectedUser, ...props }) => {
 };
 
 const ActivityDetailsModal = ({ onClose, activityId, selectedUser }) => {
-    const activity = selectedUser.activities[activityId];
-  
-    if (!activity || !activity.questions) {
-      return (
-        <Modal onClose={onClose}>
-          <div className="p-6 bg-white rounded-lg shadow-lg">
-            <h2 className="text-2xl font-bold mb-4">Activity Details</h2>
-            <p>No available question data</p>
-          </div>
-        </Modal>
-      );
-    }
-  
+  const activity = selectedUser.activities[activityId];
+
+  if (!activity || !activity.questions) {
     return (
       <Modal onClose={onClose}>
         <div className="p-6 bg-white rounded-lg shadow-lg">
           <h2 className="text-2xl font-bold mb-4">Activity Details</h2>
-  
-          <table className="w-full mb-4 border border-gray-300">
-            <thead className="text-xs text-gray-700 uppercase bg-gray-50">
-              <tr>
-                <th className="px-4 py-2">Question</th>
-                <th className="px-4 py-2">Point</th>
-              </tr>
-            </thead>
-            <tbody>
-              {Object.entries(activity.questions).map(([questionId, question]) => (
-                <tr key={questionId} className="odd:bg-white even:bg-gray-50">
-                  <td className="px-4 py-2 border">{question.question}</td>
-                  <td
-                    className={`px-4 py-2 border ${
-                      question.correct ? 'text-green-600' : 'text-red-600'
-                    }`}
-                  >
-                    {question.correct ? 'Correct' : 'Wrong'}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <p>No available question data</p>
         </div>
       </Modal>
     );
+  }
+
+  const isRunnerMinigame = activity.minigame === 'Runner';
+
+  return (
+    <Modal onClose={onClose}>
+      <div className="relative overflow-x-auto shadow-md sm:rounded-lg p-4">
+        <h2 className="text-2xl font-bold mb-4 mt-4 px-4">Activity Details</h2>
+
+        <table className="w-full mb-4 border border-gray-300">
+          <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+            <tr>
+              <th className="px-4 py-2">Question</th>
+              <th className="px-4 py-2">{isRunnerMinigame ? 'Wrong Attempts' : 'Point'}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {Object.entries(activity.questions).map(([questionId, question]) => (
+              <tr key={questionId} className="odd:bg-white even:bg-gray-50">
+                <td className="px-4 py-2 border">{question.question}</td>
+                <td className={`px-4 py-2 border ${
+                      isRunnerMinigame ? (question.attempts === 0 ? 'text-green-600' : 'text-red-600') : 
+                      (question.correct ? 'text-green-600' : 'text-red-600')
+                    }`}>
+                  {isRunnerMinigame ? question.attempts : (question.correct ? 'Correct' : 'Wrong')}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </Modal>
+  );
 };
 
 export default ActivityModal;
