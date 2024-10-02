@@ -9,6 +9,11 @@ import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
 import Loading from '../components/UI/Loading';
 
+// import XLSX from 'xlsx';
+// import { Workbook } from 'xlsx';
+import * as Excel from 'exceljs';
+
+
 const Dashboard = () => {
   const navigate = useNavigate()
   const [usersData, setUsersData] = useState(null)
@@ -143,8 +148,64 @@ const Dashboard = () => {
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const currentItems = sortedUsers.slice(startIndex, startIndex + itemsPerPage);
- 
+
+
+  // Dashboard Data to Excel Logic
+  const generateExcelFile = (filteredUsers) => {
+    const workbook = new Excel.Workbook();
+    const worksheet = workbook.addWorksheet('Users Data');
   
+    // Set header row
+    const headerRow = worksheet.addRow([
+      'Name',
+      'History of Computer',
+      'Elements of Computer System',
+      'Number System',
+      'Introduction to Programming',
+    ]);
+  
+    // Set header row font, background color, height, alignment, and font color
+    headerRow.font = { bold: true, color: { argb: 'FFFFFF' } }; // Set font color to white
+    headerRow.height = 30; // Set the height of the header row
+    headerRow.eachCell((cell) => {
+      cell.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: '0000FF' }, // Keep the background color blue
+      };
+      cell.alignment = { vertical: 'middle', horizontal: 'center' }; // Keep the middle alignment
+    });
+  
+    // Add data rows
+    filteredUsers.forEach(([userId, user]) => {
+      worksheet.addRow([
+        user.profile?.name || 'N/A',
+        user.stats?.computerHistory || 'N/A',
+        user.stats?.computerElements || 'N/A',
+        user.stats?.numberSystem || 'N/A',
+        user.stats?.introProgramming || 'N/A',
+      ]);
+    });
+  
+    //Set column widths
+    worksheet.columns = [
+      { header: 'Name', key: 'name', width: 30 }, // Increased width to 30
+      { header: 'History of Computer', key: 'computerHistory', width: 40 }, // Increased width to 40
+      { header: 'Elements of Computer System', key: 'computerElements', width: 50 }, // Increased width to 50
+      { header: 'Number System', key: 'numberSystem', width: 30 }, // Increased width to 30
+      { header: 'Introduction to Programming', key: 'introProgramming', width: 50 }, // Increased width to 50
+    ];
+  
+    // Save the workbook to a file
+    workbook.xlsx.writeBuffer().then((buffer) => {
+      const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'users_data.xlsx';
+      a.click();
+    });
+  };
 
 
   return (
@@ -176,7 +237,7 @@ const Dashboard = () => {
       </form>
 
 
-      <div className="mb-4 flex items-center space-x-4">
+      <div className="mt-4 flex justify-between items-center pb-4">
         {/* Items per Page Dropdown */}
         <div className="flex items-center">
           <label htmlFor="itemsPerPage" className="mr-2">Items per Page:</label>
@@ -214,6 +275,14 @@ const Dashboard = () => {
             </MenuItems>
           </Menu>
         </div>
+        
+        {/* Export to Excel Button */}
+        <button 
+          onClick={() => generateExcelFile(filteredUsers)}
+          className="text-green-700 hover:text-white border border-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 inline-flex items-center me-2 mb-2 dark:border-green-500 dark:text-green-500 dark:hover:text-white dark:hover:bg-green-500 dark:focus:ring-blue-800">
+          <svg class="fill-current w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z"/></svg>
+          <span>Export to Excel</span>
+        </button>
       </div>
      
     {currentItems.length > 0 ? (

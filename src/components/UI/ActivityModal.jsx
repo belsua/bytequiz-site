@@ -8,7 +8,7 @@ const ActivityModal = ({ onClose, selectedUser, ...props }) => {
   const [selectedMode, setSelectedMode] = React.useState('');
   const [selectedTopic, setSelectedTopic] = React.useState('');
   const [selectedMinigame, setSelectedMinigame] = React.useState('');
-  const [sortActivityOrder, setActivitySortOrder] = React.useState('asc');
+  const [sortActivityOrder, setActivitySortOrder] = React.useState('desc');
   const [sortActivityColumn, setActivitySortColumn] = React.useState('date-time');
   const [currentPage, setCurrentPage] = React.useState(1);
   const [itemsPerPage, setItemsPerPage] = React.useState(10);
