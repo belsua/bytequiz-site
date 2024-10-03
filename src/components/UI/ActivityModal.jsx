@@ -8,7 +8,7 @@ const ActivityModal = ({ onClose, selectedUser, ...props }) => {
   const [selectedMode, setSelectedMode] = React.useState('');
   const [selectedTopic, setSelectedTopic] = React.useState('');
   const [selectedMinigame, setSelectedMinigame] = React.useState('');
-  const [sortActivityOrder, setActivitySortOrder] = React.useState('asc');
+  const [sortActivityOrder, setActivitySortOrder] = React.useState('desc');
   const [sortActivityColumn, setActivitySortColumn] = React.useState('date-time');
   const [currentPage, setCurrentPage] = React.useState(1);
   const [itemsPerPage, setItemsPerPage] = React.useState(10);
@@ -69,14 +69,18 @@ const ActivityModal = ({ onClose, selectedUser, ...props }) => {
     setCurrentPage(pageNumber);
   };
 
-  const handleItemsPerPageChange = (event) => {
-    setItemsPerPage(parseInt(event.target.value, 10));
-    setCurrentPage(pageNumber);
-  };
+  // const handleItemsPerPageChange = (event) => {
+  //   setItemsPerPage(parseInt(event.target.value, 10));
+  //   setCurrentPage(1);
+  // };
 
   const handleSearchChange = (event) => {
     setSearchDate(event.target.value);
-    setCurrentPage(pageNumber);
+    if (currentPage !== 1) {
+      setCurrentPage(1);
+    } else {
+      setCurrentPage(pageNumber);
+    }
   };
 
   const handleActivitySort = (column) => {
@@ -87,17 +91,30 @@ const ActivityModal = ({ onClose, selectedUser, ...props }) => {
 
   const handleModeChange = (mode) => {
     setSelectedMode(mode);
-    setCurrentPage(pageNumber);
+    if (currentPage !== 1) {
+      setCurrentPage(1);
+    } else {
+      setCurrentPage(pageNumber);
+    }
   };
 
   const handleTopicChange = (topic) => {
     setSelectedTopic(topic);
-    setCurrentPage(pageNumber);
+    if (currentPage !== 1) {
+      setCurrentPage(1);
+    } else {
+      setCurrentPage(pageNumber);
+    }
   };
+
 
   const handleMinigameChange = (minigame) => {
     setSelectedMinigame(minigame);
-    setCurrentPage(pageNumber);
+    if (currentPage !== 1) {
+      setCurrentPage(1);
+    } else {
+      setCurrentPage(pageNumber);
+    }
   };
 
   const handleViewActivityQuestion = (activityId) => {
@@ -261,7 +278,7 @@ const ActivityModal = ({ onClose, selectedUser, ...props }) => {
                   </MenuItem>
                   <MenuItem>
                     <button
-                      onClick={() => handleTopicChange('Introduction to Programming')}
+                      onClick={() => handleTopicChange('Intro to Programming')}
                       className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     >
                       Introduction to Programming
@@ -404,7 +421,9 @@ const ActivityModal = ({ onClose, selectedUser, ...props }) => {
 
       <div className="mt-4 flex justify-between items-center mb-2">
         <div>
-          <span>Page {currentPage} of {totalPages}</span>
+          <span>
+            {totalPages === 0 ? 'Page 0 of 0' : `Page ${currentPage} of ${totalPages}`}
+          </span>
         </div>
         <div>
           <button
