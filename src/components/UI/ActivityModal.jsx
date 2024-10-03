@@ -69,14 +69,18 @@ const ActivityModal = ({ onClose, selectedUser, ...props }) => {
     setCurrentPage(pageNumber);
   };
 
-  const handleItemsPerPageChange = (event) => {
-    setItemsPerPage(parseInt(event.target.value, 10));
-    setCurrentPage(pageNumber);
-  };
+  // const handleItemsPerPageChange = (event) => {
+  //   setItemsPerPage(parseInt(event.target.value, 10));
+  //   setCurrentPage(1);
+  // };
 
   const handleSearchChange = (event) => {
     setSearchDate(event.target.value);
-    setCurrentPage(pageNumber);
+    if (currentPage !== 1) {
+      setCurrentPage(1);
+    } else {
+      setCurrentPage(pageNumber);
+    }
   };
 
   const handleActivitySort = (column) => {
@@ -87,17 +91,30 @@ const ActivityModal = ({ onClose, selectedUser, ...props }) => {
 
   const handleModeChange = (mode) => {
     setSelectedMode(mode);
-    setCurrentPage(pageNumber);
+    if (currentPage !== 1) {
+      setCurrentPage(1);
+    } else {
+      setCurrentPage(pageNumber);
+    }
   };
 
   const handleTopicChange = (topic) => {
     setSelectedTopic(topic);
-    setCurrentPage(pageNumber);
+    if (currentPage !== 1) {
+      setCurrentPage(1);
+    } else {
+      setCurrentPage(pageNumber);
+    }
   };
+
 
   const handleMinigameChange = (minigame) => {
     setSelectedMinigame(minigame);
-    setCurrentPage(pageNumber);
+    if (currentPage !== 1) {
+      setCurrentPage(1);
+    } else {
+      setCurrentPage(pageNumber);
+    }
   };
 
   const handleViewActivityQuestion = (activityId) => {
@@ -261,7 +278,7 @@ const ActivityModal = ({ onClose, selectedUser, ...props }) => {
                   </MenuItem>
                   <MenuItem>
                     <button
-                      onClick={() => handleTopicChange('Introduction to Programming')}
+                      onClick={() => handleTopicChange('Intro to Programming')}
                       className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     >
                       Introduction to Programming
