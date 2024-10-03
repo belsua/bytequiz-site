@@ -421,7 +421,9 @@ const ActivityModal = ({ onClose, selectedUser, ...props }) => {
 
       <div className="mt-4 flex justify-between items-center mb-2">
         <div>
-          <span>Page {currentPage} of {totalPages}</span>
+          <span>
+            {totalPages === 0 ? 'Page 0 of 0' : `Page ${currentPage} of ${totalPages}`}
+          </span>
         </div>
         <div>
           <button

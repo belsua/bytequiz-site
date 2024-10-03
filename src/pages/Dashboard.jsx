@@ -373,7 +373,9 @@ const Dashboard = () => {
       {/* Pagination Controls */}
       <div className="mt-4 flex justify-between items-center">
         <div>
-          <span>Page {currentPage} of {totalPages}</span>
+          <span>
+            {totalPages === 0 ? 'Page 0 of 0' : `Page ${currentPage} of ${totalPages}`}
+          </span>
         </div>
         <div>
           <button
