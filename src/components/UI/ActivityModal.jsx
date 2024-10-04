@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Modal from './Modal';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import { ChevronDownIcon } from '@heroicons/react/20/solid';
+import * as Excel from 'exceljs';
 
 const ActivityModal = ({ onClose, selectedUser, ...props }) => {
   const [searchDate, setSearchDate] = React.useState('');
@@ -14,7 +15,7 @@ const ActivityModal = ({ onClose, selectedUser, ...props }) => {
   const [itemsPerPage, setItemsPerPage] = React.useState(10);
   const [selectedActivityId, setSelectedActivityId] = React.useState(null);
   const [isActivityDetailsModalOpen, setIsActivityDetailsModalOpen] = React.useState(false);
-
+  
   const filteredActivities = Object.entries(selectedUser.activities)
   .filter(([activityId, activity]) => {
     const activityDate = new Date(activity['date-time']).toISOString().split('T')[0];
@@ -67,6 +68,65 @@ const ActivityModal = ({ onClose, selectedUser, ...props }) => {
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
+  };
+
+  const generateActivityExcelFile = (filteredActivities) => {
+    const workbook = new Excel.Workbook();
+    const worksheet = workbook.addWorksheet('Activity Data');
+  
+    // Set header row
+    const headerRow = worksheet.addRow([
+      'Date-Time',
+      'Minigame',
+      'Mode',
+      'Topic',
+      'Score',
+      'Players',
+    ]);
+  
+    // Set header row font, background color, height, alignment, and font color
+    headerRow.font = { bold: true, color: { argb: 'FFFFFF' } }; // Set font color to white
+    headerRow.height = 30; // Set the height of the header row
+    headerRow.eachCell((cell) => {
+      cell.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: '0000FF' }, // Keep the background color blue
+      };
+      cell.alignment = { vertical: 'middle', horizontal: 'center' }; // Keep the middle alignment
+    });
+  
+    // Add data rows
+    filteredActivities.forEach(([activityId, activity]) => {
+      worksheet.addRow([
+        activity['date-time'],
+        activity.minigame || 'N/A',
+        activity.mode || 'N/A',
+        activity.topic || 'N/A',
+        activity.score || 'N/A',
+        activity.players ? activity.players.join(', ') : 'No players available',
+      ]);
+    });
+  
+    // Set column widths
+    worksheet.columns = [
+      { header: 'Date-Time', key: 'date-time', width: 20 },
+      { header: 'Minigame', key: 'minigame', width: 15 },
+      { header: 'Mode', key: 'mode', width: 10 },
+      { header: 'Topic', key: 'topic', width: 20 },
+      { header: 'Score', key: 'score', width: 10 },
+      { header: 'Players', key: 'players', width: 30 },
+    ];
+  
+    // Save the workbook to a file
+    workbook.xlsx.writeBuffer().then((buffer) => {
+      const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'activity_data.xlsx';
+      a.click();
+    });
   };
 
   // const handleItemsPerPageChange = (event) => {
@@ -145,204 +205,218 @@ const ActivityModal = ({ onClose, selectedUser, ...props }) => {
               className="block w-full p-4 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
               placeholder="Select date"
             />
-        </div>
+          </div>    
         </form>
 
-        <div className="mb-4 flex items-center space-x-4">
-          <div className="flex items-center">
-            <label htmlFor="itemsPerPage" className="mr-2">Items per Page:</label>
-            <Menu as="div" className="relative inline-block text-left">
-              <div>
-                <MenuButton 
-                  className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 disabled:opacity-40"
-                  disabled={paginatedActivities.length === 0}
-                  >
-                  {itemsPerPage}
-                  <ChevronDownIcon aria-hidden="true" className="-mr-1 h-5 w-5 text-gray-400" />
-                </MenuButton>
-              </div>
+        <div className="mb-4 flex-row lg:flex items-center lg:space-x-4">
+          <div className="grid grid-flow-col justify-stretch space-x-4 lg:flex lg:space-x-4">
+            <div className="grid justify-items-stretch lg:flex items-center">
+              <label htmlFor="itemsPerPage" className="mr-2">Items per Page:</label>
+              <Menu as="div" className="relative inline-block text-left">
+                <div>
+                  <MenuButton 
+                    className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 disabled:opacity-40"
+                    disabled={paginatedActivities.length === 0}
+                    >
+                    {itemsPerPage}
+                    <ChevronDownIcon aria-hidden="true" className="-mr-1 h-5 w-5 text-gray-400" />
+                  </MenuButton>
+                </div>
 
-              <MenuItems
-                transition
-                className="absolute right-0 z-10 mt-2 w-auto min-w-[150px] max-w-[300px] origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
-              >
-                <div className="py-1">
-                  {[10, 20, 30, 50].map(count => (
-                    <MenuItem key={count}>
+                <MenuItems
+                  transition
+                  className="absolute right-0 z-10 mt-2 w-auto min-w-[150px] max-w-[300px] origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
+                >
+                  <div className="py-1">
+                    {[10, 20, 30, 50].map(count => (
+                      <MenuItem key={count}>
+                        <button
+                          onClick={() => {
+                            setItemsPerPage(count);
+                            setCurrentPage(1);
+                          }}
+                          className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        >
+                          {count}
+                        </button>
+                      </MenuItem>
+                    ))}
+                  </div>
+                </MenuItems>
+              </Menu>
+            </div>
+
+            <div className="grid justify-items-stretch lg:flex items-center">
+              <label htmlFor="mode" className="mr-2">Filter by Mode:</label>
+              <Menu as="div" className="relative inline-block text-left">
+                <div>
+                  <MenuButton className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+                    {selectedMode || 'All Modes'}
+                    <ChevronDownIcon aria-hidden="true" className="-mr-1 h-5 w-5 text-gray-400" />
+                  </MenuButton>
+                </div>
+
+                <MenuItems
+                  transition
+                  className="absolute right-0 z-10 mt-2 w-auto min-w-[150px] max-w-[300px] origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
+                >
+                  <div className="py-1">
+                    <MenuItem>
                       <button
-                        onClick={() => {
-                          setItemsPerPage(count);
-                          setCurrentPage(1);
-                        }}
+                        onClick={() => handleModeChange('')}
                         className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                       >
-                        {count}
+                        All Modes
                       </button>
                     </MenuItem>
-                  ))}
+                    <MenuItem>
+                      <button
+                        onClick={() => handleModeChange('Multiplayer')}
+                        className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      >
+                        Multiplayer
+                      </button>
+                    </MenuItem>
+                    <MenuItem>
+                      <button
+                        onClick={() => handleModeChange('Singleplayer')}
+                        className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      >
+                        Singleplayer
+                      </button>
+                    </MenuItem>
+                  </div>
+                </MenuItems>
+              </Menu>
+            </div>
+          </div>
+          
+          <div className="grid grid-flow-col justify-stretch space-x-4 lg:flex lg:space-x-4">
+            <div className="grid justify-items-stretch mt-2 lg:mt-0 lg:flex items-center">
+              <label htmlFor="topic" className="mr-2">Filter by Topic:</label>
+              <Menu as="div" className="relative inline-block text-left">
+                <div>
+                  <MenuButton className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+                    {selectedTopic || 'All Topics'}
+                    <ChevronDownIcon aria-hidden="true" className="-mr-1 h-5 w-5 text-gray-400" />
+                  </MenuButton>
                 </div>
-              </MenuItems>
-            </Menu>
+
+                <MenuItems
+                  transition
+                  className="absolute right-0 z-10 mt-2 w-auto min-w-[150px] max-w-[300px] origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
+                >
+                  <div className="py-1">
+                    <MenuItem>
+                      <button
+                        onClick={() => handleTopicChange('')}
+                        className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      >
+                        All Topics
+                      </button>
+                    </MenuItem>
+                    <MenuItem>
+                      <button
+                        onClick={() => handleTopicChange('History of Computer')}
+                        className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      >
+                        History of Computer
+                      </button>
+                    </MenuItem>
+                    <MenuItem>
+                      <button
+                        onClick={() => handleTopicChange('Elements of Computer System')}
+                        className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      >
+                        Elements of Computer System
+                      </button>
+                    </MenuItem>
+                    <MenuItem>
+                      <button
+                        onClick={() => handleTopicChange('Number System')}
+                        className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      >
+                        Number System
+                      </button>
+                    </MenuItem>
+                    <MenuItem>
+                      <button
+                        onClick={() => handleTopicChange('Intro to Programming')}
+                        className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      >
+                        Introduction to Programming
+                      </button>
+                    </MenuItem>
+                  </div>
+                </MenuItems>
+              </Menu>
+            </div>
+
+            <div className="grid justify-items-stretch mt-2 lg:mt-0 lg:flex items-center">
+              <label htmlFor="minigame" className="mr-2">Filter by Minigame:</label>
+              <Menu as="div" className="relative inline-block text-left">
+                <div>
+                  <MenuButton className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+                    {selectedMinigame || 'All Minigames'}
+                    <ChevronDownIcon aria-hidden="true" className="-mr-1 h-5 w-5 text-gray-400" />
+                  </MenuButton>
+                </div>
+
+                <MenuItems
+                  transition
+                  className="absolute right-0 z-10 mt-2 w-auto min-w-[150px] max-w-[300px] origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
+                >
+                  <div className="py-1">
+                    <MenuItem>
+                      <button
+                        onClick={() => handleMinigameChange('')}
+                        className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      >
+                        All Minigames
+                      </button>
+                    </MenuItem>
+                    <MenuItem>
+                      <button
+                        onClick={() => handleMinigameChange('Runner')}
+                        className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      >
+                        Runner
+                      </button>
+                    </MenuItem>
+                    <MenuItem>
+                      <button
+                        onClick={() => handleMinigameChange('Trivia Showdown')}
+                        className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      >
+                        Trivia Showdown
+                      </button>
+                    </MenuItem>
+                    <MenuItem>
+                      <button
+                        onClick={() => handleMinigameChange('Territory Conquest')}
+                        className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      >
+                        Territory Conquest
+                      </button>
+                    </MenuItem>
+                  </div>
+                </MenuItems>
+              </Menu>
+            </div>
           </div>
 
-          <div className="flex items-center">
-            <label htmlFor="mode" className="mr-2">Filter by Mode:</label>
-            <Menu as="div" className="relative inline-block text-left">
-              <div>
-                <MenuButton className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
-                  {selectedMode || 'All Modes'}
-                  <ChevronDownIcon aria-hidden="true" className="-mr-1 h-5 w-5 text-gray-400" />
-                </MenuButton>
-              </div>
-
-              <MenuItems
-                transition
-                className="absolute right-0 z-10 mt-2 w-auto min-w-[150px] max-w-[300px] origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
-              >
-                <div className="py-1">
-                  <MenuItem>
-                    <button
-                      onClick={() => handleModeChange('')}
-                      className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    >
-                      All Modes
-                    </button>
-                  </MenuItem>
-                  <MenuItem>
-                    <button
-                      onClick={() => handleModeChange('Multiplayer')}
-                      className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    >
-                      Multiplayer
-                    </button>
-                  </MenuItem>
-                  <MenuItem>
-                    <button
-                      onClick={() => handleModeChange('Singleplayer')}
-                      className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    >
-                      Singleplayer
-                    </button>
-                  </MenuItem>
-                </div>
-              </MenuItems>
-            </Menu>
-          </div>
-
-          <div className="flex items-center">
-            <label htmlFor="topic" className="mr-2">Filter by Topic:</label>
-            <Menu as="div" className="relative inline-block text-left">
-              <div>
-                <MenuButton className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
-                  {selectedTopic || 'All Topics'}
-                  <ChevronDownIcon aria-hidden="true" className="-mr-1 h-5 w-5 text-gray-400" />
-                </MenuButton>
-              </div>
-
-              <MenuItems
-                transition
-                className="absolute right-0 z-10 mt-2 w-auto min-w-[150px] max-w-[300px] origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
-              >
-                <div className="py-1">
-                  <MenuItem>
-                    <button
-                      onClick={() => handleTopicChange('')}
-                      className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    >
-                      All Topics
-                    </button>
-                  </MenuItem>
-                  <MenuItem>
-                    <button
-                      onClick={() => handleTopicChange('History of Computer')}
-                      className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    >
-                      History of Computer
-                    </button>
-                  </MenuItem>
-                  <MenuItem>
-                    <button
-                      onClick={() => handleTopicChange('Elements of Computer System')}
-                      className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    >
-                      Elements of Computer System
-                    </button>
-                  </MenuItem>
-                  <MenuItem>
-                    <button
-                      onClick={() => handleTopicChange('Number System')}
-                      className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    >
-                      Number System
-                    </button>
-                  </MenuItem>
-                  <MenuItem>
-                    <button
-                      onClick={() => handleTopicChange('Intro to Programming')}
-                      className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    >
-                      Introduction to Programming
-                    </button>
-                  </MenuItem>
-                </div>
-              </MenuItems>
-            </Menu>
-          </div>
-
-          <div className="flex items-center">
-            <label htmlFor="minigame" className="mr-2">Filter by Minigame:</label>
-            <Menu as="div" className="relative inline-block text-left">
-              <div>
-                <MenuButton className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
-                  {selectedMinigame || 'All Minigames'}
-                  <ChevronDownIcon aria-hidden="true" className="-mr-1 h-5 w-5 text-gray-400" />
-                </MenuButton>
-              </div>
-
-              <MenuItems
-                transition
-                className="absolute right-0 z-10 mt-2 w-auto min-w-[150px] max-w-[300px] origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 transition focus:outline-none data-[closed]:scale-95 data-[closed]:transform data-[closed]:opacity-0 data-[enter]:duration-100 data-[leave]:duration-75 data-[enter]:ease-out data-[leave]:ease-in"
-              >
-                <div className="py-1">
-                  <MenuItem>
-                    <button
-                      onClick={() => handleMinigameChange('')}
-                      className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    >
-                      All Minigames
-                    </button>
-                  </MenuItem>
-                  <MenuItem>
-                    <button
-                      onClick={() => handleMinigameChange('Runner')}
-                      className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    >
-                      Runner
-                    </button>
-                  </MenuItem>
-                  <MenuItem>
-                    <button
-                      onClick={() => handleMinigameChange('Trivia Showdown')}
-                      className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    >
-                      Trivia Showdown
-                    </button>
-                  </MenuItem>
-                  <MenuItem>
-                    <button
-                      onClick={() => handleMinigameChange('Territory Conquest')}
-                      className="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    >
-                      Territory Conquest
-                    </button>
-                  </MenuItem>
-                </div>
-              </MenuItems>
-            </Menu>
+          <div className="grid grid-flow-col justify-stretch space-x-4 lg:border-l-2 mt-4 lg:mt-0 lg:flex">
+            <button
+              onClick={() => generateActivityExcelFile(filteredActivities)}
+              className="lg:ml-4  text-green-700 hover:text-white border border-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 inline-flex flex-1 justify-center items-center dark:border-green-500 dark:text-green-500 dark:hover:text-white dark:hover:bg-green-500 dark:focus:ring-blue-800">
+              <svg class="fill-current w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z"/></svg>
+              Export Activity Data
+            </button>
           </div>
         </div>
 
         {paginatedActivities.length > 0 ? (
+        <div className="relative overflow-x-auto shadow-md lg:rounded-lg">
           <table className="w-full mb-4 border border-gray-300">
             <thead className="text-xs text-gray-700 uppercase bg-gray-50">
               <tr>
@@ -397,7 +471,7 @@ const ActivityModal = ({ onClose, selectedUser, ...props }) => {
                   <td className="px-4 py-2 border">
                     <button
                       onClick={() => handleViewActivityQuestion(activityId)}
-                      className="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-300 rounded hover:bg-gray-100 hover:text-blue-600 focus:z-10 focus:ring-2 focus:ring-blue-500 focus:text-blue-600"
+                      className="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 hover:text-blue-600 focus:z-10 focus:ring-2 focus:ring-blue-500 focus:text-blue-600"
                     >
                       View Activity Question
                     </button>
@@ -406,6 +480,7 @@ const ActivityModal = ({ onClose, selectedUser, ...props }) => {
               ))}
             </tbody>
           </table>
+        </div>
       ) : (
         <p>No activities data available</p>
       )}
@@ -419,7 +494,7 @@ const ActivityModal = ({ onClose, selectedUser, ...props }) => {
         />
       )}
 
-      <div className="mt-4 flex justify-between items-center mb-2">
+      <div className="mt-4 flex justify-between items-center">
         <div>
           <span>
             {totalPages === 0 ? 'Page 0 of 0' : `Page ${currentPage} of ${totalPages}`}

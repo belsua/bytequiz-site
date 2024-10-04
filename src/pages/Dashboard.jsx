@@ -8,6 +8,7 @@ import ActivityModal from '../components/UI/ActivityModal'; // Import the Activi
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
 import Loading from '../components/UI/Loading';
+import ExportToExcelButton from '../components/UI/ExportToExcelButton';
 
 // import XLSX from 'xlsx';
 // import { Workbook } from 'xlsx';
@@ -237,9 +238,9 @@ const Dashboard = () => {
       </form>
 
 
-      <div className="mt-4 flex justify-between items-center pb-4">
+      <div className="mt-4 flex-row lg:flex lg:justify-between pb-4">
         {/* Items per Page Dropdown */}
-        <div className="flex items-center">
+        <div className="flex lg:block items-center">
           <label htmlFor="itemsPerPage" className="mr-2">Items per Page:</label>
           <Menu as="div" className="relative inline-block text-left">
             <div>
@@ -274,19 +275,32 @@ const Dashboard = () => {
               </div>
             </MenuItems>
           </Menu>
+
+          {/* Export to Excel Button for Phone*/}
+          <button 
+            onClick={() => generateExcelFile(filteredUsers)}
+            className="lg:hidden ml-2  text-green-700 hover:text-white border border-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 inline-flex flex-1 justify-center items-center dark:border-green-500 dark:text-green-500 dark:hover:text-white dark:hover:bg-green-500 dark:focus:ring-blue-800">
+            <svg class="fill-current w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z"/></svg>
+            <span>Export Dashboard Data</span>
+          </button>
         </div>
         
-        {/* Export to Excel Button */}
-        <button 
-          onClick={() => generateExcelFile(filteredUsers)}
-          className="text-green-700 hover:text-white border border-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 inline-flex items-center me-2 mb-2 dark:border-green-500 dark:text-green-500 dark:hover:text-white dark:hover:bg-green-500 dark:focus:ring-blue-800">
-          <svg class="fill-current w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z"/></svg>
-          <span>Export to Excel</span>
-        </button>
+        <div className="lg:flex lg:gap-4 lg:divide-x">
+          {/* Export to Excel Button for Bigger Screen*/}
+          <button 
+            onClick={() => generateExcelFile(filteredUsers)}
+            className="hidden lg:flex text-green-700 hover:text-white border border-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 inline-flex items-center dark:border-green-500 dark:text-green-500 dark:hover:text-white dark:hover:bg-green-500 dark:focus:ring-blue-800">
+            <svg class="fill-current w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z"/></svg>
+            <span>Export Dashboard Data</span>
+          </button>
+
+          {/* Export All Activity by Date */}
+          {usersData && <ExportToExcelButton usersData={usersData} />}
+        </div>
       </div>
      
     {currentItems.length > 0 ? (
-      <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
+      <div className="relative overflow-x-auto shadow-md lg:rounded-lg">
         <table className="w-full text-sm text-left text-gray-500">
           <thead className="text-xs text-gray-700 uppercase bg-gray-50">
             <tr>
@@ -439,6 +453,7 @@ const Dashboard = () => {
           selectedUser={selectedUser}
         />
       )}
+
     </div>
   );
 }
