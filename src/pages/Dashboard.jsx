@@ -13,6 +13,7 @@ import ExportToExcelButton from '../components/UI/ExportToExcelButton';
 // import XLSX from 'xlsx';
 // import { Workbook } from 'xlsx';
 import * as Excel from 'exceljs';
+import { Helmet } from 'react-helmet';
 
 
 const Dashboard = () => {
@@ -210,6 +211,10 @@ const Dashboard = () => {
 
 
   return (
+    <>
+    <Helmet>
+      <title>Dashboard - ByteQuiz</title>
+    </Helmet>
     <div className="container mx-auto p-4">
       <h1 className="text-4xl font-bold text-left mt-10 mb-10">Users Dashboard</h1>
 
@@ -455,6 +460,7 @@ const Dashboard = () => {
       )}
 
     </div>
+    </>
   );
 }
 
