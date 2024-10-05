@@ -17,7 +17,7 @@ const Modal = ({ onClose, children }) => {
         </div>
 
         {/* Modal content with scroll */}
-        <div className="p-6 flex-wrap overflow-x-auto overflow-y-auto max-h-[60vh] w-fit">
+        <div className="p-6 flex-wrap overflow-x-auto overflow-y-auto max-h-[60vh] w-full">
           {children}
         </div>
       </div>

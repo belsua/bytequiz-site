@@ -217,7 +217,7 @@ const Questions = () => {
                 >
                   <div className="p-5 border border-b-0 border-gray-200">
                     <p className="mb-2 text-gray-500">
-                      Yes, your instructor can monitor your academic progress within the game. You can select one in-game character to share your quiz scores and learning data with your instructor. This data includes quiz performance, unlocked topics, and completed learning materials, which your instructor can view through their dashboard.
+                      Yes, your instructor can monitor your academic progress within the game. You can select one in-game character by clicking the "Cloud" toggle in the Main Menu to share your chosen character's quiz scores and learning data with your instructor and to the Leaderboards. Your instructors can view data which includes quiz performance, unlocked topics, and completed learning materials, through the ByteQuiz dashboard.
                     </p>
                   </div>
                 </div>
@@ -275,7 +275,7 @@ const Questions = () => {
                       : '0px',
                     transition: 'max-height 0.3s ease-in-out',
                   }}
-                >
+                  >
                   <div className="p-5 border border-t-0 border-gray-200">
                     <p className="mb-2 text-gray-500">
                       To play with others, use the Multiplayer mode. You can either host a game or join an existing room. Once in a room, you can compete in quiz-based game modes like "Runner," "Trivia Showdown," or "Territory Conquest." A stable internet connection is required for multiplayer gameplay.
