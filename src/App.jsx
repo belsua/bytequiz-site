@@ -8,6 +8,7 @@ import Login from './components/Auth/Login'
 import ProtectedRoute from './components/ProtectedRoute'
 import NotFoundPage from './components/UI/NotFoundPage'
 import { AuthProvider } from './contexts/AuthContext'
+import ClassroomPage from './pages/ClassroomPage';
 
 
 function App() {
@@ -28,6 +29,7 @@ function App() {
                   </ProtectedRoute>
                 }
               />
+              <Route path="/classroom/:classroomID" element={<ClassroomPage />} />
               <Route path="*" element={<NotFoundPage />} /> // Add this route             
             </Routes>
           </main>
