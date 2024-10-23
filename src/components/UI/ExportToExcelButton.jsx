@@ -6,6 +6,11 @@ const ExportToExcelButton = ({ usersData }) => {
   const [date, setDate] = useState('');
 
   const handleExport = () => {
+    if (!usersData || typeof usersData !== 'object') {
+      console.error('usersData is not valid');
+      return; // Exit the function if usersData is invalid
+    }
+
     const workbook = new Excel.Workbook();
     const worksheet = workbook.addWorksheet('Activities Data');
 
@@ -34,7 +39,11 @@ const ExportToExcelButton = ({ usersData }) => {
 
     // Add data rows
     Object.keys(usersData).forEach((userId) => {
-      const userActivities = usersData[userId].activities;
+      const userActivities = usersData[userId]?.activities;
+      if (!userActivities) {
+        console.warn(`No activities found for user ID: ${userId}`);
+        return;
+      }
       Object.keys(userActivities).forEach((activityId) => {
         const activity = userActivities[activityId];
         const activityDate = new Date(activity['date-time']).getTime();
