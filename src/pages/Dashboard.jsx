@@ -373,10 +373,16 @@ const Dashboard = () => {
                     </button>
                     <button
                       onClick={() => openActivityModal(user)}
-                      className="px-4 py-2 text-sm font-medium text-gray-900 bg-white border-t border-b border-gray-300 rounded-r-lg hover:bg-gray-100 hover:text-blue-600 focus:z-10 focus:ring-2 focus:ring-blue-500 focus:text-blue-600"
+                      disabled={!user.stats || 
+                        (Object.values(user.stats).every(value => value === 0 || value === false)) // Disable if all stats are 0 or false
+                      }
+                      className={`px-4 py-2 text-sm font-medium text-gray-900 bg-white border-t border-b border-gray-300 rounded-r-lg hover:bg-gray-100 hover:text-blue-600 focus:z-10 focus:ring-2 focus:ring-blue-500 focus:text-blue-600 ${
+                        !user.stats || (Object.values(user.stats).every(value => value === 0 || value === false)) ? 'opacity-50 cursor-not-allowed' : ''
+                      }`}
                     >
-                      View Activity
+                      {!user.stats || (Object.values(user.stats).every(value => value === 0 || value === false)) ? "No Activity Yet" : "View Activities"}
                     </button>
+                    
                   </div>
                 </td>
               </tr>
