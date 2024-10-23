@@ -100,6 +100,11 @@ const Dashboard = () => {
 
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value.toLowerCase());
+    if (currentPage !== 1) {
+      setCurrentPage(1);
+    } else {
+      setCurrentPage(pageNumber);
+    }
   };
 
   const handleSort = (column) => {
