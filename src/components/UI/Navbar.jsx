@@ -1,5 +1,5 @@
 // src/components/UI/Navbar.jsx
-import React, { useContext, useState } from 'react'
+import { useContext, useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { AuthContext } from '../../contexts/AuthContext' // Import AuthContext
 import Logo from '../../assets/Logo.webp'
@@ -30,7 +30,7 @@ const Navbar = () => {
         <div className="hidden md:flex md:justify-center md:items-center">
           {user && (
             <>
-              <Link to="/dashboard" className="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center text-white rounded-lg bg-blue-600 hover:bg-blue-700">
+              <Link to="/teacher/dashboard" className="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center text-white rounded-lg bg-blue-600 hover:bg-blue-700">
                 Dashboard
               </Link>
               <div className="mx-2" /> {/* Add a gap between Dashboard and Sign Out buttons */}
@@ -69,9 +69,9 @@ const Navbar = () => {
           >
             <path
               stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
               d="M1 1h15M1 7h15M1 13h15"
             />
           </svg>

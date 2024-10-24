@@ -19,7 +19,7 @@ const Login = () => {
     e.preventDefault()
     try {
       await login(email, password) // Use login from AuthContext
-      navigate('/dashboard') // Navigate to the dashboard after successful login
+      navigate('/teacher/dashboard') // Navigate to the dashboard after successful login
     } catch (error) {
       setError(error.message) // Display error message on login failure
     }
