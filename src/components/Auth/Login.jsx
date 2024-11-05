@@ -1,7 +1,7 @@
 // src/components/Auth/Login.jsx
-import React, { useState, useContext } from 'react'
+import { useState, useContext, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { AuthContext } from '../../contexts/AuthContext' // Import AuthContext
+import { AuthContext } from '../../contexts/AuthContext'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { Helmet } from 'react-helmet';
@@ -11,9 +11,15 @@ const Login = () => {
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false) // Add a state to track password visibility
   const [error, setError] = useState(null)
-  const { login } = useContext(AuthContext) // Access the login function from AuthContext
+  const { login, user } = useContext(AuthContext) // Access the login function from AuthContext
   const navigate = useNavigate()
 
+  // Redirect to dashboard if user is already logged in
+  useEffect(() => {
+    if (user) {
+      navigate('/dashboard')
+    }
+  }, [user, navigate]);
 
   const handleSubmit = async e => {
     e.preventDefault()
