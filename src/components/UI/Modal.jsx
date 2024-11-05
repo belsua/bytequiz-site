@@ -1,10 +1,17 @@
 import React from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimes } from '@fortawesome/free-solid-svg-icons';
 
 const Modal = ({ onClose, children }) => {
+    const handleBackgroundClick = (event) => {
+      if (event.target === event.currentTarget) {
+        onClose();
+      }
+    };
+    
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-hidden bg-black bg-opacity-50 px-4">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center overflow-y-hidden bg-black bg-opacity-50 px-4"
+      onClick={handleBackgroundClick}
+    >
       <div className="relative bg-white rounded-lg shadow-lg w-fit overflow-x-auto overflow-y-auto">
         {/* Modal close button */}
         <div className="sticky left-2 justify-end p-4">
