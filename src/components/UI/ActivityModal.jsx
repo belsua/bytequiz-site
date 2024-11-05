@@ -48,8 +48,11 @@ const ActivityModal = ({ onClose, selectedUser, ...props }) => {
           bValue = b[1][sortActivityColumn] || '';
           break;
         case 'score':
-          aValue = parseInt(a[1][sortActivityColumn], 10) || 0;
-          bValue = parseInt(b[1][sortActivityColumn], 10) || 0;
+          const [aNumerator, aDenominator] = (a[1][sortActivityColumn] || '0/1').split('/').map(Number);
+          const [bNumerator, bDenominator] = (b[1][sortActivityColumn] || '0/1').split('/').map(Number);
+          
+          aValue = aDenominator ? aNumerator / aDenominator : 0;
+          bValue = bDenominator ? bNumerator / bDenominator : 0;
           break;
         case 'players':
           aValue = a[1][sortActivityColumn] ? a[1][sortActivityColumn].length : 0;
