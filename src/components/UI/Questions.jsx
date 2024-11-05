@@ -11,8 +11,10 @@ const Questions = () => {
 
   const handleAccordion = (accordionId) => {
     setActiveAccordions((prevAccordions) => ({
-      ...prevAccordions,
-      [accordionId]: !prevAccordions[accordionId],
+      ...Object.keys(prevAccordions).reduce((acc, key) => {
+        acc[key] = key === accordionId ? !prevAccordions[key] : false;
+        return acc;
+      }, {}),
     }));
   };
 
