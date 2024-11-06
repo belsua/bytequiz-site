@@ -1,102 +1,73 @@
-// src/components/Dashboard.jsx
-import React, { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { ref, get } from 'firebase/database' // Import Firebase database functions
-import { database } from '../firebase/firebase' // Import the database instance
-import Modal from '../components/UI/Modal'; // Import the Modal component ADDEDD
-import ActivityModal from '../components/UI/ActivityModal'; // Import the ActivityModal component
+import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { database } from '../../firebase/firebase';
+import { ref, get } from 'firebase/database';
+import * as Excel from 'exceljs';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
-import Loading from '../components/UI/Loading';
-import ExportToExcelButton from '../components/UI/ExportToExcelButton';
+import Modal from '../../components/UI/Modal';
+import ActivityModal from '../../components/UI/ActivityModal';
+import Loading from '../../components/UI/Loading';
+import ExportToExcelButton from '../../components/UI/ExportToExcelButton';
 
-// import XLSX from 'xlsx';
-// import { Workbook } from 'xlsx';
-import * as Excel from 'exceljs';
-import { Helmet } from 'react-helmet';
-
-
-const Dashboard = () => {
-  const navigate = useNavigate()
-  const [usersData, setUsersData] = useState(null)
-  //ADDED
-  const [searchQuery, setSearchQuery] = useState(''); // State for search query
-  const [selectedUser, setSelectedUser] = useState(null);
+function ClassroomPage() {
+  const { classroomID } = useParams();
+  const [players, setPlayers] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedPlayer, setSelectedPlayer] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
-
-  const [sortColumn, setSortColumn] = useState('name'); // State for current sort column
-  const [sortOrder, setSortOrder] = useState('asc'); // State for sort order
-
-
+  const [sortColumn, setSortColumn] = useState('name');
+  const [sortOrder, setSortOrder] = useState('asc');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
-
-
- 
   const [isActivityModalOpen, setIsActivityModalOpen] = useState(false);
 
-  const [sortActivityOrder, setActivitySortOrder] = useState('asc'); // State for sort order
-  const [sortActivityColumn, setActivitySortColumn] = useState('name'); // State for current sort column
-
-  
-
-  
-  // Fetch all users' data from Firebase
   useEffect(() => {
-    const fetchData = async () => {
-      const usersRef = ref(database, 'users');
-     
+    const fetchPlayers = async () => {
+      const classroomRef = ref(database, `classrooms/${classroomID}/players`);
+
       try {
-        const snapshot = await get(usersRef);
+        const snapshot = await get(classroomRef);
         if (snapshot.exists()) {
           const data = snapshot.val();
-          setUsersData(data);
-          
-          const sections = new Set(Object.values(data).map(user => user.profile?.section).filter(section => section));
-          setUniqueSections([...sections]);
+          const playerList = data ? Object.entries(data) : [];
+          setPlayers(playerList);
         } else {
           console.log('No data available');
         }
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error('Error fetching players:', error);
       }
     };
 
-    fetchData();
-  }, [navigate]);
+    fetchPlayers();
+  }, [classroomID]);
 
-  
-  if (!usersData) {
+  if (!players) {
     return (
       <Loading />
     );
   }
-  
-  
 
-  const openModal = (user) => {
-    setSelectedUser(user);
+  const openModal = (player) => {
+    setSelectedPlayer(player);
     setIsModalOpen(true);
   };
 
-
   const closeModal = () => {
     setIsModalOpen(false);
-    setSelectedUser(null);
+    setSelectedPlayer(null);
   };
 
-
-  const openActivityModal = (user) => {
-    setSelectedUser(user);
+  const openActivityModal = (player) => {
+    setSelectedPlayer(player);
     setIsActivityModalOpen(true);
   };
 
   const closeActivityModal = () => {
     setIsActivityModalOpen(false);
-    setSelectedUser(null);
+    setSelectedPlayer(null);
   };
-
 
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value.toLowerCase());
@@ -113,54 +84,35 @@ const Dashboard = () => {
     setSortOrder(isAsc ? 'desc' : 'asc');
   };
 
-
-  const handleActivitySort = (column) => {
-    const isAsc = sortActivityColumn === column && sortActivityOrder === 'asc';
-    setActivitySortColumn(column);
-    setActivitySortOrder(isAsc ? 'desc' : 'asc');
-  };
-
-
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
 
+  // eslint-disable-next-line no-unused-vars
+  const filteredPlayers = players.filter(([_, playerData]) =>
+    playerData.profile?.name?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
-  const handleItemsPerPageChange = (event) => {
-    setItemsPerPage(parseInt(event.target.value, 10));
-    setCurrentPage(1); // Reset to first page on change
-  };
-
-
-  const filteredUsers = usersData
-  ? Object.entries(usersData).filter(([userId, user]) =>
-      user.profile?.name?.toLowerCase().includes(searchQuery)
-    )
-  : [];
-
-
-  const sortedUsers = filteredUsers.sort((a, b) => {
-    const aValue = a[1].profile[sortColumn] || a[1].stats[sortColumn] || '';
-    const bValue = b[1].profile[sortColumn] || b[1].stats[sortColumn] || '';
-
+  const sortedPlayers = filteredPlayers.sort((a, b) => {
+    const aValue = a[1].profile?.[sortColumn] || a[1].stats?.[sortColumn] || '';
+    const bValue = b[1].profile?.[sortColumn] || b[1].stats?.[sortColumn] || '';
 
     if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1;
     if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1;
     return 0;
   });
-
-
+  
   // Pagination logic
-  const totalItems = sortedUsers.length;
+  const totalItems = sortedPlayers.length;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentItems = sortedUsers.slice(startIndex, startIndex + itemsPerPage);
-
+  const currentItems = sortedPlayers.slice(startIndex, startIndex + itemsPerPage);
+  
 
   // Dashboard Data to Excel Logic
-  const generateExcelFile = (filteredUsers) => {
+  const generateExcelFile = (filteredPlayers) => {
     const workbook = new Excel.Workbook();
-    const worksheet = workbook.addWorksheet('Users Data');
+    const worksheet = workbook.addWorksheet('Players Data');
   
     // Set header row
     const headerRow = worksheet.addRow([
@@ -184,13 +136,13 @@ const Dashboard = () => {
     });
   
     // Add data rows
-    filteredUsers.forEach(([userId, user]) => {
+    filteredPlayers.forEach(player => {
       worksheet.addRow([
-        user.profile?.name || 'N/A',
-        user.stats?.computerHistory || 'N/A',
-        user.stats?.computerElements || 'N/A',
-        user.stats?.numberSystem || 'N/A',
-        user.stats?.introProgramming || 'N/A',
+        player.profile?.name || 'N/A',
+        player.stats?.computerHistory || 'N/A',
+        player.stats?.computerElements || 'N/A',
+        player.stats?.numberSystem || 'N/A',
+        player.stats?.introProgramming || 'N/A',
       ]);
     });
   
@@ -209,22 +161,15 @@ const Dashboard = () => {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'users_data.xlsx';
+      a.download = 'players_data.xlsx';
       a.click();
     });
   };
 
-
   return (
-    <>
-    <Helmet>
-      <title>Dashboard - ByteQuiz</title>
-    </Helmet>
     <div className="container mx-auto p-4">
-      <h1 className="text-4xl font-bold text-left mt-10 mb-10">Users Dashboard</h1>
-
-
       {/* Search Input Field */}
+      <h1 className="text-2xl font-bold mb-4">Classroom: {classroomID}</h1>
       <form className="mb-4">
         <label className="block text-gray-700 font-bold mb-2" htmlFor="search">
           Search Student
@@ -247,7 +192,7 @@ const Dashboard = () => {
         </div>
       </form>
 
-
+      {/* Pagination */}
       <div className="mt-4 flex-row lg:flex lg:justify-between pb-4">
         {/* Items per Page Dropdown */}
         <div className="flex lg:block items-center">
@@ -255,14 +200,13 @@ const Dashboard = () => {
           <Menu as="div" className="relative inline-block text-left">
             <div>
               <MenuButton 
-              className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 disabled:opacity-40"
+              className="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 disabled:opacity-40" id='itemsPerPage'
               disabled={currentItems.length === 0}
               >
                 {itemsPerPage}
                 <ChevronDownIcon aria-hidden="true" className="-mr-1 h-5 w-5 text-gray-400" />
               </MenuButton>
             </div>
-
 
             <MenuItems
               transition
@@ -288,28 +232,29 @@ const Dashboard = () => {
 
           {/* Export to Excel Button for Phone*/}
           <button 
-            onClick={() => generateExcelFile(filteredUsers)}
+            onClick={() => generateExcelFile(filteredPlayers)}
             className="lg:hidden ml-2  text-green-700 hover:text-white border border-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 inline-flex flex-1 justify-center items-center dark:border-green-500 dark:text-green-500 dark:hover:text-white dark:hover:bg-green-500 dark:focus:ring-blue-800">
-            <svg class="fill-current w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z"/></svg>
+            <svg className="fill-current w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z"/></svg>
             <span>Export Dashboard Data</span>
           </button>
         </div>
         
-        <div className="lg:flex lg:gap-4 lg:divide-x">
+      <div className="lg:flex lg:gap-4 lg:divide-x">
           {/* Export to Excel Button for Bigger Screen*/}
           <button 
-            onClick={() => generateExcelFile(filteredUsers)}
+            onClick={() => generateExcelFile(filteredPlayers)}
             className="hidden lg:flex text-green-700 hover:text-white border border-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 inline-flex items-center dark:border-green-500 dark:text-green-500 dark:hover:text-white dark:hover:bg-green-500 dark:focus:ring-blue-800">
-            <svg class="fill-current w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z"/></svg>
+            <svg className="fill-current w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z"/></svg>
             <span>Export Dashboard Data</span>
           </button>
 
           {/* Export All Activity by Date */}
-          {usersData && <ExportToExcelButton usersData={usersData} />}
+          {players && <ExportToExcelButton players={players} />}
         </div>
       </div>
      
-    {currentItems.length > 0 ? (
+      {/* Table */}
+      {currentItems.length > 0 ? (
       <div className="relative overflow-x-auto shadow-md lg:rounded-lg">
         <table className="w-full text-sm text-left text-gray-500">
           <thead className="text-xs text-gray-700 uppercase bg-gray-50">
@@ -348,44 +293,44 @@ const Dashboard = () => {
             </tr>
           </thead>
           <tbody>
-            {currentItems.map(([userId, user]) => (
+            {currentItems.map(([playerId, player]) => (
               <tr
-                key={userId}
+                key={playerId}
                 className="odd:bg-white even:bg-gray-50 border-b"
               >
                 <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
-                  {user.profile?.name || 'N/A'}
+                  {player.profile?.name || 'N/A'}
                 </td>
                 <td className="px-6 py-4">
-                  {user.stats?.computerHistory || 'N/A'}
+                  {player.stats?.computerHistory || 'N/A'}
                 </td>
                 <td className="px-6 py-4">
-                  {user.stats?.computerElements || 'N/A'}
+                  {player.stats?.computerElements || 'N/A'}
                 </td>
                 <td className="px-6 py-4">
-                  {user.stats?.numberSystem || 'N/A'}
+                  {player.stats?.numberSystem || 'N/A'}
                 </td>
                 <td className="px-6 py-4">
-                  {user.stats?.introProgramming || 'N/A'}
+                  {player.stats?.introProgramming || 'N/A'}
                 </td>
                 <td className="px-6 py-4">
                   <div className="inline-flex rounded-md shadow-sm" role="group">
                     <button
-                      onClick={() => openModal(user)}
+                      onClick={() => openModal(player)}
                       className="px-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-300 rounded-l-lg hover:bg-gray-100 hover:text-blue-600 focus:z-10 focus:ring-2 focus:ring-blue-500 focus:text-blue-600"
                     >
                       View Profile
                     </button>
                     <button
-                      onClick={() => openActivityModal(user)}
-                      disabled={!user.stats || 
-                        (Object.values(user.stats).every(value => value === 0 || value === false)) // Disable if all stats are 0 or false
+                      onClick={() => openActivityModal(player)}
+                      disabled={!player.stats || 
+                        (Object.values(player.stats).every(value => value === 0 || value === false)) // Disable if all stats are 0 or false
                       }
                       className={`px-4 py-2 text-sm font-medium text-gray-900 bg-white border-t border-b border-gray-300 rounded-r-lg hover:bg-gray-100 hover:text-blue-600 focus:z-10 focus:ring-2 focus:ring-blue-500 focus:text-blue-600 ${
-                        !user.stats || (Object.values(user.stats).every(value => value === 0 || value === false)) ? 'opacity-50 cursor-not-allowed' : ''
+                        !player.stats || (Object.values(player.stats).every(value => value === 0 || value === false)) ? 'opacity-50 cursor-not-allowed' : ''
                       }`}
                     >
-                      {!user.stats || (Object.values(user.stats).every(value => value === 0 || value === false)) ? "No Activity Yet" : "View Activities"}
+                      {!player.stats || (Object.values(player.stats).every(value => value === 0 || value === false)) ? "No Activity Yet" : "View Activities"}
                     </button>
                     
                   </div>
@@ -396,9 +341,8 @@ const Dashboard = () => {
         </table>
       </div>
       ) : (
-        <p className="text-center text-gray-500">No user's data available</p>
+        <p className="text-center text-gray-500">No player&apos;s data available</p>
       )}
-
 
       {/* Pagination Controls */}
       <div className="mt-4 flex justify-between items-center">
@@ -410,14 +354,14 @@ const Dashboard = () => {
         <div>
           <button
             onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1 || filteredUsers.length === 0}
+            disabled={currentPage === 1 || filteredPlayers.length === 0}
             className="px-4 py-2 bg-blue-500 text-white rounded mr-2 disabled:bg-gray-400"
           >
             Previous
           </button>
           <button
             onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === totalPages || filteredUsers.length === 0}
+            disabled={currentPage === totalPages || filteredPlayers.length === 0}
             className="px-4 py-2 bg-blue-500 text-white rounded disabled:bg-gray-400"
           >
             Next
@@ -425,55 +369,48 @@ const Dashboard = () => {
         </div>
       </div>
 
-
       {/* Details Modal */}
-      {isModalOpen && selectedUser && (
+      {isModalOpen && selectedPlayer && (
         <Modal onClose={closeModal}>
           <div className="p-6 bg-white rounded-lg shadow-lg">
-            <h2 className="text-2xl font-bold mb-4">{selectedUser.profile?.username || 'Player'} Details</h2>
+            <h2 className="text-2xl font-bold mb-4">{selectedPlayer.profile?.username || 'Player'} Details</h2>
 
             <h3 className="text-xl font-semibold mb-2">In-Game Profile</h3>
             <table className="min-w-full mb-4 border border-gray-300">
               <tbody>
-                <tr><td className="px-4 py-2 border">Name:</td><td className="px-4 py-2 border">{selectedUser.profile?.name || 'N/A'}</td></tr>
-                <tr><td className="px-4 py-2 border">Username:</td><td className="px-4 py-2 border">{selectedUser.profile?.username || 'N/A'}</td></tr>
-                <tr><td className="px-4 py-2 border">Age:</td><td className="px-4 py-2 border">{selectedUser.profile?.age || 'N/A'}</td></tr>
-                <tr><td className="px-4 py-2 border">Gender:</td><td className="px-4 py-2 border">{selectedUser.profile?.gender || 'N/A'}</td></tr>
-                <tr><td className="px-4 py-2 border">Player ID:</td><td className="px-4 py-2 border">{selectedUser.profile?.playerId || 'N/A'}</td></tr>
-                <tr><td className="px-4 py-2 border">Avatar:</td><td className="px-4 py-2 border">{selectedUser.profile?.avatar || 'N/A'}</td></tr>
+                <tr><td className="px-4 py-2 border">Name:</td><td className="px-4 py-2 border">{selectedPlayer.profile?.name || 'N/A'}</td></tr>
+                <tr><td className="px-4 py-2 border">Username:</td><td className="px-4 py-2 border">{selectedPlayer.profile?.username || 'N/A'}</td></tr>
+                <tr><td className="px-4 py-2 border">Age:</td><td className="px-4 py-2 border">{selectedPlayer.profile?.age || 'N/A'}</td></tr>
+                <tr><td className="px-4 py-2 border">Gender:</td><td className="px-4 py-2 border">{selectedPlayer.profile?.gender || 'N/A'}</td></tr>
+                <tr><td className="px-4 py-2 border">Player ID:</td><td className="px-4 py-2 border">{selectedPlayer.profile?.playerId || 'N/A'}</td></tr>
+                <tr><td className="px-4 py-2 border">Avatar:</td><td className="px-4 py-2 border">{selectedPlayer.profile?.avatar || 'N/A'}</td></tr>
               </tbody>
             </table>
-
 
             <h3 className="text-xl font-semibold mb-2">In-Game Statistics</h3>
             <table className="min-w-full mb-4 border border-gray-300">
               <tbody>
-                <tr><td className="px-4 py-2 border">Computer History:</td><td className="px-4 py-2 border">{selectedUser.stats?.computerHistory || 'N/A'}</td></tr>
-                <tr><td className="px-4 py-2 border">Computer Elements:</td><td className="px-4 py-2 border">{selectedUser.stats?.computerElements || 'N/A'}</td></tr>
-                <tr><td className="px-4 py-2 border">Number System:</td><td className="px-4 py-2 border">{selectedUser.stats?.numberSystem || 'N/A'}</td></tr>
-                <tr><td className="px-4 py-2 border">Introduction to Programming:</td><td className="px-4 py-2 border">{selectedUser.stats?.introProgramming || 'N/A'}</td></tr>
-                <tr><td className="px-4 py-2 border">Unlocked Introduction to Programming:</td><td className="px-4 py-2 border">{selectedUser.stats?.isIntroProgrammingUnlocked ? 'Yes' : 'No'}</td></tr>
-                <tr><td className="px-4 py-2 border">Unlocked Number System:</td><td className="px-4 py-2 border">{selectedUser.stats?.isNumberSystemUnlocked ? 'Yes' : 'No'}</td></tr>
+                <tr><td className="px-4 py-2 border">Computer History:</td><td className="px-4 py-2 border">{selectedPlayer.stats?.computerHistory || 'N/A'}</td></tr>
+                <tr><td className="px-4 py-2 border">Computer Elements:</td><td className="px-4 py-2 border">{selectedPlayer.stats?.computerElements || 'N/A'}</td></tr>
+                <tr><td className="px-4 py-2 border">Number System:</td><td className="px-4 py-2 border">{selectedPlayer.stats?.numberSystem || 'N/A'}</td></tr>
+                <tr><td className="px-4 py-2 border">Introduction to Programming:</td><td className="px-4 py-2 border">{selectedPlayer.stats?.introProgramming || 'N/A'}</td></tr>
+                <tr><td className="px-4 py-2 border">Unlocked Introduction to Programming:</td><td className="px-4 py-2 border">{selectedPlayer.stats?.isIntroProgrammingUnlocked ? 'Yes' : 'No'}</td></tr>
+                <tr><td className="px-4 py-2 border">Unlocked Number System:</td><td className="px-4 py-2 border">{selectedPlayer.stats?.isNumberSystemUnlocked ? 'Yes' : 'No'}</td></tr>
               </tbody>
             </table>
           </div>
-        </Modal>
-        
+        </Modal>  
       )}
-
 
       {/* Activity Modal */}
-      {isActivityModalOpen && selectedUser && (
+      {isActivityModalOpen && selectedPlayer && (
         <ActivityModal
           onClose={closeActivityModal}
-          selectedUser={selectedUser}
+          selectedUser={selectedPlayer}
         />
       )}
-
     </div>
-    </>
   );
 }
 
-
-export default Dashboard
+export default ClassroomPage;
