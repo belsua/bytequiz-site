@@ -70,6 +70,8 @@ function ClassroomPage() {
     );
   }
 
+  const playersObject = Object.fromEntries(players);
+
   const openModal = (player) => {
     setSelectedPlayer(player);
     setIsModalOpen(true);
@@ -272,7 +274,8 @@ function ClassroomPage() {
           </button>
 
           {/* Export All Activity by Date */}
-          {players && <ExportToExcelButton players={players} />}
+          {console.log(players)}
+          {players && <ExportToExcelButton usersData={playersObject} />}
         </div>
       </div>
      
