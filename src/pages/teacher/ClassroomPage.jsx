@@ -9,9 +9,11 @@ import Modal from '../../components/UI/Modal';
 import ActivityModal from '../../components/UI/ActivityModal';
 import Loading from '../../components/UI/Loading';
 import ExportToExcelButton from '../../components/UI/ExportToExcelButton';
+import ClassroomHeader from '../../components/UI/ClassroomHeader';
 
 function ClassroomPage() {
   const { classroomID } = useParams();
+  const [classroomName, setClassroomName] = useState('');
   const [players, setPlayers] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedPlayer, setSelectedPlayer] = useState(null);
@@ -21,6 +23,25 @@ function ClassroomPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [isActivityModalOpen, setIsActivityModalOpen] = useState(false);
+
+  useEffect(() => {
+    const fetchClassroomData = async () => {
+      const classroomRef = ref(database, `classrooms/${classroomID}`);
+      try {
+        const snapshot = await get(classroomRef);
+        if (snapshot.exists()) {
+          const data = snapshot.val();
+          setClassroomName(data.name); // Assuming classroom object has a 'name' property
+        } else {
+          console.log('No classroom data available');
+        }
+      } catch (error) {
+        console.error('Error fetching classroom data:', error);
+      }
+    };
+
+    fetchClassroomData();
+  }, [classroomID]);
 
   useEffect(() => {
     const fetchPlayers = async () => {
@@ -168,9 +189,11 @@ function ClassroomPage() {
 
   return (
     <div className="container mx-auto p-4">
+
+    <ClassroomHeader classroomID={classroomID} classrooms={classroomName} />
+      
       {/* Search Input Field */}
-      <h1 className="text-2xl font-bold mb-4">Classroom: {classroomID}</h1>
-      <form className="mb-4">
+      <form className="mb-4 mt-4">
         <label className="block text-gray-700 font-bold mb-2" htmlFor="search">
           Search Student
         </label>
@@ -371,10 +394,8 @@ function ClassroomPage() {
 
       {/* Details Modal */}
       {isModalOpen && selectedPlayer && (
-        <Modal onClose={closeModal}>
-          <div className="p-6 bg-white rounded-lg shadow-lg">
-            <h2 className="text-2xl font-bold mb-4">{selectedPlayer.profile?.username || 'Player'} Details</h2>
-
+        <Modal onClose={closeModal} headerText={`${selectedPlayer.profile?.username || 'Player'} Profile Details`}>
+          <div className="p-6 pt bg-white rounded-lg shadow-lg">
             <h3 className="text-xl font-semibold mb-2">In-Game Profile</h3>
             <table className="min-w-full mb-4 border border-gray-300">
               <tbody>

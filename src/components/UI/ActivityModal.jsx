@@ -186,10 +186,8 @@ const ActivityModal = ({ onClose, selectedUser, ...props }) => {
   };
 
   return (
-    <Modal onClose={onClose}>
+    <Modal onClose={onClose} headerText={`${selectedUser.profile?.username || 'Player'} Activity Details`}>
       <div className="bg-white rounded-lg shadow-lg container mx-auto p-6">
-        <h2 className="text-2xl font-bold mb-4">{selectedUser.profile?.username || 'Player'} Activity Details </h2>
-
         <form className="mb-4">
           <label className="block text-gray-700 font-bold mb-2" htmlFor="date-search">
             Search by Date:
