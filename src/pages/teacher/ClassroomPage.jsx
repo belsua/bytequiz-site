@@ -157,13 +157,13 @@ function ClassroomPage() {
     });
   
     // Add data rows
-    filteredPlayers.forEach(player => {
+    filteredPlayers.forEach(([playerId, playerData]) => {
       worksheet.addRow([
-        player.profile?.name || 'N/A',
-        player.stats?.computerHistory || 'N/A',
-        player.stats?.computerElements || 'N/A',
-        player.stats?.numberSystem || 'N/A',
-        player.stats?.introProgramming || 'N/A',
+        playerData.profile?.name || 'N/A',
+        playerData.stats?.computerHistory || 'N/A',
+        playerData.stats?.computerElements || 'N/A',
+        playerData.stats?.numberSystem || 'N/A',
+        playerData.stats?.introProgramming || 'N/A',
       ]);
     });
   
@@ -258,7 +258,7 @@ function ClassroomPage() {
             onClick={() => generateExcelFile(filteredPlayers)}
             className="lg:hidden ml-2  text-green-700 hover:text-white border border-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 inline-flex flex-1 justify-center items-center dark:border-green-500 dark:text-green-500 dark:hover:text-white dark:hover:bg-green-500 dark:focus:ring-blue-800">
             <svg className="fill-current w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z"/></svg>
-            <span>Export Dashboard Data</span>
+            <span>Export Class Data</span>
           </button>
         </div>
         
@@ -268,7 +268,7 @@ function ClassroomPage() {
             onClick={() => generateExcelFile(filteredPlayers)}
             className="hidden lg:flex text-green-700 hover:text-white border border-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 inline-flex items-center dark:border-green-500 dark:text-green-500 dark:hover:text-white dark:hover:bg-green-500 dark:focus:ring-blue-800">
             <svg className="fill-current w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z"/></svg>
-            <span>Export Dashboard Data</span>
+            <span>Export Classroom Data</span>
           </button>
 
           {/* Export All Activity by Date */}
