@@ -9,6 +9,7 @@ import DeleteModal from '../../components/UI/DeleteModal';
 import DashboardHeader from '../../components/UI/DashboardHeader';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import { EllipsisVerticalIcon } from '@heroicons/react/24/outline';
+import { PlusCircleIcon } from '@heroicons/react/20/solid';
 
 function Dashboard() 
 {
@@ -133,8 +134,10 @@ function Dashboard()
           <h2 className="text-2xl font-semibold text-gray-700">Your Classrooms</h2>
           <button
             onClick={() => setIsCreateRoomOpen(true)}
-            className="lg:flex text-green-700 hover:text-white border border-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 inline-flex items-center dark:border-green-500 dark:text-green-500 dark:hover:text-white dark:hover:bg-green-500 dark:focus:ring-blue-800">
-            Create New Classroom
+            className="lg:flex pl-1 text-green-700 hover:text-white border border-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 inline-flex items-center dark:border-green-500 dark:text-green-500 dark:hover:text-white dark:hover:bg-green-500 dark:focus:ring-blue-800">
+            <PlusCircleIcon className="h-5 w-5 mx-2" aria-hidden="true" />
+            <p className='hidden sm:flex'>Create New Classroom</p>
+            <p className='sm:hidden'>New Classroom</p>
           </button>
         </div>
 

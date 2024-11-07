@@ -1,12 +1,13 @@
 // src/components/UI/Navbar.jsx
 import { useContext, useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate, Link, useLocation } from 'react-router-dom'
 import { AuthContext } from '../../contexts/AuthContext' // Import AuthContext
 import Logo from '../../assets/Logo.webp'
 
 
 const Navbar = () => {
   const navigate = useNavigate()
+  const location = useLocation()
   const { user, logout } = useContext(AuthContext) // Access user and logout from AuthContext
   const [showNav, setShowNav] = useState(false) // Add a state to track the visibility of the navigation links
 
@@ -30,9 +31,11 @@ const Navbar = () => {
         <div className="hidden md:flex md:justify-center md:items-center">
           {user && (
             <>
-              <Link to="/teacher/dashboard" className="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center text-white rounded-lg bg-blue-600 hover:bg-blue-700">
-                Dashboard
-              </Link>
+              {location.pathname !== '/teacher/dashboard' && (
+                <Link to="/teacher/dashboard" className="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center text-white rounded-lg bg-blue-600 hover:bg-blue-700">
+                  Back to Dashboard
+                </Link>
+              )}
               <div className="mx-2" /> {/* Add a gap between Dashboard and Sign Out buttons */}
               <button
                 onClick={handleLogout}
@@ -80,11 +83,13 @@ const Navbar = () => {
           <ul className="font-medium flex flex-col p-4 mt-4 border border-gray-100 rounded-lg bg-gray-50 dark:bg-gray-800 dark:border-gray-700 w-full">
             {user && (
               <>
-                <li className="w-full">
-                  <Link to="/teacher/dashboard" className="text-center block py-2 px-3 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-white md:dark:text-blue-500 w-full">
-                    Dashboard
-                  </Link>
-                </li>
+                {location.pathname !== '/teacher/dashboard' && (
+                  <li className="w-full">
+                    <Link to="/teacher/dashboard" className="text-center block py-2 px-3 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-white md:dark:text-blue-500 w-full">
+                      Back to Dashboard
+                    </Link>
+                  </li>
+                )}
                 <li className="mt-2 w-full">
                   <button
                     onClick={handleLogout}
