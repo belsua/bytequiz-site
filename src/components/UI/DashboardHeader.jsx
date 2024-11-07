@@ -5,7 +5,7 @@ const Card = ({ user }) => {
   return (
     <div className="m-4 p-6 bg-gradient-to-r from-blue-500 via-blue-600 to-indigo-600 border-gray-200 rounded-lg shadow-md">
       <div className="relative">
-        <div className="relative z-10">
+        <div className="relative">
           <h2 className="mb-2 text-2xl font-bold tracking-tight text-white">
             Welcome back, Teacher {user ? user.email : ''} 
           </h2>
