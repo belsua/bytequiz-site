@@ -3,17 +3,20 @@ import { useContext, useState } from 'react'
 import { useNavigate, Link, useLocation } from 'react-router-dom'
 import { AuthContext } from '../../contexts/AuthContext' // Import AuthContext
 import Logo from '../../assets/Logo.webp'
+import SignOutConfirmation from './SignOutConfirmation'; // Import the SignOutConfirmation component
 
 
 const Navbar = () => {
   const navigate = useNavigate()
   const location = useLocation()
+  const [isModalOpen, setIsModalOpen] = useState(false); // State for modal visibility
   const { user, logout } = useContext(AuthContext) // Access user and logout from AuthContext
   const [showNav, setShowNav] = useState(false) // Add a state to track the visibility of the navigation links
 
 
   const handleLogout = async () => {
     await logout() // Call the logout function from AuthContext
+    setIsModalOpen(false); // Close the modal
     navigate('/') // Redirect to home after sign-out
   }
 
@@ -38,7 +41,7 @@ const Navbar = () => {
               )}
               <div className="mx-2" /> {/* Add a gap between Dashboard and Sign Out buttons */}
               <button
-                onClick={handleLogout}
+                onClick={() => setIsModalOpen(true)}
                 className="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center text-white rounded-lg bg-red-600 hover:bg-red-700"
               >
                 Sign Out
@@ -92,7 +95,7 @@ const Navbar = () => {
                 )}
                 <li className="mt-2 w-full">
                   <button
-                    onClick={handleLogout}
+                    onClick={() => setIsModalOpen(true)}
                     className="block py-2 px-3 text-white bg-red-700 rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-white md:dark:text-blue-500 w-full"
                   >
                     Sign Out
@@ -113,6 +116,11 @@ const Navbar = () => {
           </ul>
         </div>
       </div>
+      <SignOutConfirmation 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+        onConfirm={handleLogout} 
+      />
     </nav>
   )
 }
