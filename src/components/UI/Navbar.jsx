@@ -4,6 +4,7 @@ import { useNavigate, Link, useLocation } from 'react-router-dom'
 import { AuthContext } from '../../contexts/AuthContext' // Import AuthContext
 import Logo from '../../assets/Logo.webp'
 import SignOutConfirmation from './SignOutConfirmation'; // Import the SignOutConfirmation component
+import { AlertCustomAnimation } from './Alert';
 
 
 const Navbar = () => {
@@ -17,6 +18,7 @@ const Navbar = () => {
   const handleLogout = async () => {
     await logout() // Call the logout function from AuthContext
     setIsModalOpen(false); // Close the modal
+    setShowAlert(true); // Show the alert after signing out
     navigate('/') // Redirect to home after sign-out
   }
 
@@ -24,6 +26,7 @@ const Navbar = () => {
     setShowNav(!showNav) // Toggle the visibility of the navigation links
   }
 
+  const [showAlert, setShowAlert] = useState(false);
 
   return (
     <nav className="bg-black/85 p-4 text-white sticky top-0 left-0 right-0 z-10 backdrop-blur-xl">
@@ -48,14 +51,22 @@ const Navbar = () => {
               </button>
             </>
           )}
-          {!user && (
-            <a
-              href="/login"
-              className="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center text-white rounded-lg bg-green-600 hover:bg-green-700"
-            >
-              For Instructor
-            </a>
-          )}
+          {!user && location.pathname !== '/login' && (
+              <a
+                href="/login"
+                className="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center text-white rounded-lg bg-green-600 hover:bg-green-700"
+              >
+                Sign In for Instructor
+              </a>
+            )}
+            {location.pathname === '/login' && (
+              <a
+                href="/"
+                className="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center text-white rounded-lg bg-blue-600 hover:bg-blue-700"
+              >
+                Back to Home
+              </a>
+            )}
         </div>
         <button
           data-collapse-toggle="navbar-default"
@@ -103,15 +114,21 @@ const Navbar = () => {
                 </li>
               </>
             )}
-            {!user && (
-              <li className="w-full">
-                <a
-                  href="/login"
-                  className="text-center block py-2 px-3 text-white bg-green-700 rounded md:bg-transparent md:text-blue-700 md:p-0 dark:text-white md:dark:text-blue-500 w-full"
-                >
-                  Sign In for Instructor
-                </a>
-              </li>
+          {!user && location.pathname !== '/login' && (
+              <a
+                href="/login"
+                className="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center text-white rounded-lg bg-green-600 hover:bg-green-700"
+              >
+                Sign In for Instructor
+              </a>
+            )}
+            {location.pathname === '/login' && (
+              <a
+                href="/"
+                className="inline-flex justify-center items-center py-3 px-5 text-base font-medium text-center text-white rounded-lg bg-blue-600 hover:bg-blue-700"
+              >
+                Back to Home
+              </a>
             )}
           </ul>
         </div>
@@ -121,6 +138,7 @@ const Navbar = () => {
         onClose={() => setIsModalOpen(false)} 
         onConfirm={handleLogout} 
       />
+      {showAlert && <AlertCustomAnimation message={"Successfully Signed Out"}/>}
     </nav>
   )
 }
