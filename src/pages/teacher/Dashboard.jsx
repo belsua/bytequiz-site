@@ -10,9 +10,9 @@ import DashboardHeader from '../../components/UI/DashboardHeader';
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react';
 import { EllipsisVerticalIcon } from '@heroicons/react/24/outline';
 import { PlusCircleIcon } from '@heroicons/react/20/solid';
+import DashboardStats from '../../components/UI/DashboardStats';
 
-function Dashboard() 
-{
+function Dashboard() {
   const navigate = useNavigate();
   const [user, setUser ] = useState(null);
   const [classroomName, setClassroomName] = useState('');
@@ -23,6 +23,11 @@ function Dashboard()
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [classroomToDelete, setClassroomToDelete] = useState(null);
   const [classroomNameToDelete, setClassroomNameToDelete] = useState('');
+  const [totalClassrooms, setTotalClassrooms] = useState(0); // New state for total classrooms
+  //ADED
+  const [totalStudents, setTotalStudents] = useState(0); // New state for total students
+  const [totalActivities, setTotalActivities] = useState(0); // New state for total activities
+
 
   const handleDeleteClassroom = (classroomID, classroomName) => {
     setClassroomToDelete(classroomID);
@@ -58,6 +63,32 @@ function Dashboard()
       const data = snapshot.val();
       const classroomsData = data ? Object.entries(data) : [];
       setClassrooms(classroomsData);
+      setTotalClassrooms(classroomsData.length); // Set the total classrooms count
+
+      // Fetch total players for all classrooms
+      let studentsCount = 0;
+      let activitiesCount = 0; // Initialize activities count
+      classroomsData.forEach(([classroomID]) => {
+        const playersQuery = ref(database, `classrooms/${classroomID}/players`); // Query for players under each classroom
+        onValue(playersQuery, (playerSnapshot) => {
+          const playersData = playerSnapshot.val();
+          const playerCount = playersData ? Object.keys(playersData).length : 0; // Count players
+          studentsCount += playerCount; // Accumulate player count
+
+
+          // Now fetch activities for each player
+          if (playersData) {
+            Object.entries(playersData).forEach(([playerID, playerData]) => {
+              const activitiesCountForPlayer = playerData.activities ? Object.keys(playerData.activities).length : 0; // Count activities
+              activitiesCount += activitiesCountForPlayer; // Accumulate activities count
+            });
+          }
+
+          setTotalStudents(studentsCount); // Update total students state
+          setTotalActivities(activitiesCount); // Update total activities state
+
+        });
+      });
     });
   };
 
@@ -126,7 +157,7 @@ function Dashboard()
       <Helmet><title>Teacher Dashboard - ByteQuiz</title></Helmet>
 
       <DashboardHeader user={user}></DashboardHeader>
-
+      
       <div className="container mx-auto p-4">
         {isCreateRoomOpen && (
           <CreateRoom isOpen={isCreateRoomOpen} onClose={() => setIsCreateRoomOpen (false)} user={user} />
