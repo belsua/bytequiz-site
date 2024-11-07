@@ -2,7 +2,7 @@ import React from 'react';
 import { Dialog, DialogBackdrop, DialogPanel, DialogTitle } from '@headlessui/react';
 import { ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 
-const DeleteModal = ({ isOpen, onClose, onConfirm }) => {
+const DeleteModal = ({ isOpen, onClose, onConfirm, classroomName, classroomID }) => {
   return (
     <Dialog open={isOpen} onClose={onClose} className="relative z-10">
       <DialogBackdrop
@@ -23,11 +23,11 @@ const DeleteModal = ({ isOpen, onClose, onConfirm }) => {
                 </div>
                 <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
                   <DialogTitle as="h3" className="text-base font-semibold text-gray-900">
-                    Delete Classroom
+                    Delete Classroom: {classroomName}
                   </DialogTitle>
                   <div className="mt-2">
                     <p className="text-sm text-gray-500">
-                      Are you sure you want to delete this classroom? This action cannot be undone.
+                      Are you sure you want to delete this classroom with ID {classroomID}? This action cannot be undone.
                     </p>
                   </div>
                 </div>

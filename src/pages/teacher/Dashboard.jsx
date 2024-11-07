@@ -22,9 +22,11 @@ function Dashboard()
   const [isCreateRoomOpen, setIsCreateRoomOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [classroomToDelete, setClassroomToDelete] = useState(null);
+  const [classroomNameToDelete, setClassroomNameToDelete] = useState('');
 
-  const handleDeleteClassroom = (classroomID) => {
+  const handleDeleteClassroom = (classroomID, classroomName) => {
     setClassroomToDelete(classroomID);
+    setClassroomNameToDelete(classroomName);
     setIsDeleteModalOpen(true);
   };
 
@@ -144,7 +146,9 @@ function Dashboard()
         <DeleteModal 
             isOpen={isDeleteModalOpen} 
             onClose={() => setIsDeleteModalOpen(false)} 
-            onConfirm={confirmDeleteClassroom} 
+            onConfirm={confirmDeleteClassroom}
+            classroomName={classroomNameToDelete}
+            classroomID={classroomToDelete}
         />
 
         <ul className="space-y-4">
@@ -191,7 +195,10 @@ function Dashboard()
                     </MenuItem>
                     <MenuItem>
                       <button
-                        onClick={() => handleDeleteClassroom(classroomID)}
+                        onClick={() => {
+                          console.log(`Deleting Classroom: ${classroom.name} (ID: ${classroomID})`);
+                          handleDeleteClassroom(classroomID, classroom.name);
+                        }}
                         className="block w-full px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
                       >
                         Delete Classroom
