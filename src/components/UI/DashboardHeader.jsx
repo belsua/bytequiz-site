@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ref, onValue } from 'firebase/database';
-import { database } from '../../firebase/firebase'; // Adjust the import based on your project structure
+import { database } from '../../firebase/firebase';
 
 
 const Card = ({ user }) => {
@@ -9,23 +9,21 @@ const Card = ({ user }) => {
   const [totalClassrooms, setTotalClassrooms] = useState(0);
 
   useEffect(() => {
-    // Fetch total classrooms
+    // Fetch total classrooms for the logged-in instructor
     const classroomsRef = ref(database, 'classrooms');
     onValue(classroomsRef, (snapshot) => {
       const classroomsData = snapshot.val();
-      const classroomsCount = classroomsData ? Object.keys(classroomsData).length : 0;
-      setTotalClassrooms(classroomsCount);
-    });
-
-    // Fetch total students and activities
-    const playersRef = ref(database, 'classrooms'); // Reference to classrooms
-    onValue(playersRef, (snapshot) => {
-      const classroomsData = snapshot.val();
       if (classroomsData) {
+        const filteredClassrooms = Object.entries(classroomsData).filter(
+          ([, classroom]) => classroom.teacherID === user.uid // Filter by teacherID
+        );
+
+        setTotalClassrooms(filteredClassrooms.length);
+
         let studentsCount = 0;
         let activitiesCount = 0;
 
-        Object.entries(classroomsData).forEach(([classroomID, classroom]) => {
+        filteredClassrooms.forEach(([, classroom]) => {
           const players = classroom.players;
           if (players) {
             studentsCount += Object.keys(players).length; // Count students
@@ -41,7 +39,7 @@ const Card = ({ user }) => {
         setTotalActivities(activitiesCount);
       }
     });
-  }, []);
+  }, [user]);
 
 
   return (
