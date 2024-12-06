@@ -1,6 +1,6 @@
 // src/components/HeroSection.jsx
 import React from 'react'
-import Logo from '../../assets/Logo.png'
+import Logo from '../../assets/Logo.webp'
 import backgroundImage from '../../assets/Sample.webp'
 
 const HeroSection = () => {
