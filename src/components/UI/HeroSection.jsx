@@ -2,6 +2,7 @@
 import React from 'react'
 import Logo from '../../assets/Logo.webp'
 import backgroundImage from '../../assets/Sample.webp'
+import { Helmet } from 'react-helmet';
 
 const HeroSection = () => {
 
@@ -14,14 +15,17 @@ const HeroSection = () => {
 
     return (
         <section
-            className="relative overflow-hidden"
-            id="HeroSection"
-            style={{
-                backgroundImage: `url(${backgroundImage})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center'
+        className="relative overflow-hidden"
+        id="HeroSection"
+        style={{
+          backgroundImage: `url(${backgroundImage})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center'
             }}
-        >        
+            >        
+            <Helmet>
+              <title>Home - ByteQuiz</title>
+            </Helmet>
             <div className="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-16">
             <div className="py-8 px-4 mx-auto max-w-screen-xl text-center lg:py-16 lg:px-12 lg:content-center relative">
                 <a onClick={() => handleScroll('Features')} className="inline-flex justify-between items-center py-1 px-1 pr-4 mb-7 text-sm text-blue-700 bg-blue-100 rounded-full hover:bg-blue-200 cursor-pointer" role="alert">

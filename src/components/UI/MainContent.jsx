@@ -12,7 +12,7 @@ const MainContent = () => {
   return (
     <section>
     <Helmet>
-      <title>Welcome to ByteQuiz - An Educational Platform for Computer Fundamentals Learning</title>
+      <title>ByteQuiz - An Educational Platform for Computer Fundamentals Learning</title>
     </Helmet>
       <HeroSection/>
       {/* <PhoneMockupSection /> */}
